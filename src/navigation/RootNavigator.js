@@ -1,13 +1,13 @@
-import React from 'react';
+import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
+import ChatroomsScreen from '@/screens/ChatroomsScreen';
+import EventsScreen from '@/screens/EventsScreen';
+import HomeScreen from '@/screens/HomeScreen';
+import LoginScreen from '@/screens/LoginScreen';
+import MessagesScreen from '@/screens/MessagesScreen';
+import ProfileScreen from '@/screens/ProfileScreen';
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
-import HomeScreen from '@/screens/HomeScreen';
-import ChatroomsScreen from '@/screens/ChatroomsScreen';
-import MessagesScreen from '@/screens/MessagesScreen';
-import EventsScreen from '@/screens/EventsScreen';
-import ProfileScreen from '@/screens/ProfileScreen';
-import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -46,6 +46,7 @@ export default function RootNavigator() {
     <Stack.Navigator>
       <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
       <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom' }} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ }} />
     </Stack.Navigator>
   );
 }
