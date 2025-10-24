@@ -39,6 +39,7 @@ function SignUpScreen({ setLoggedIn, setScreenToShow }) {
     const [realName, setRealName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordVerify, setPasswordVerify] = useState('');
 
     return (
         <ScreenContainer>
@@ -65,7 +66,16 @@ function SignUpScreen({ setLoggedIn, setScreenToShow }) {
                     placeholderTextColor="#6b7280"
                     secureTextEntry={true}
                 />
+                <TextInput
+                    value={passwordVerify}
+                    onChangeText={setPasswordVerify}
+                    placeholder="Verify password"
+                    style={styles.input}
+                    placeholderTextColor="#6b7280"
+                    secureTextEntry={true}
+                />
                 <View />
+                <Text style={styles.itemText}>Passwords { password === passwordVerify ? "do" : "do not" } match</Text>
                 <TouchableOpacity style={styles.btn} onPress={() => setLoggedIn(true)}>
                     <Text style={styles.btnText}>Sign Up</Text>
                 </TouchableOpacity>
