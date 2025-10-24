@@ -35,7 +35,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
     input: {
-        flex: 1,
+        height: 48,
         backgroundColor: '#111827',
         borderRadius: 999,
         padding: 14,
