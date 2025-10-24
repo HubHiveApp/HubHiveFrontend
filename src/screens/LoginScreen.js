@@ -1,10 +1,12 @@
 import ScreenContainer from "@/components/ScreenContainer";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function LoginScreen() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { setLoggedIn } = useAuth();
 
     return (
         <ScreenContainer>
@@ -25,7 +27,7 @@ export default function LoginScreen() {
                     secureTextEntry={true}
                 />
                 <View/>
-                <TouchableOpacity style={styles.btn}>
+                <TouchableOpacity style={styles.btn} onPress={() => setLoggedIn(true)}>
                     <Text style={styles.btnText}>Login</Text>
                 </TouchableOpacity>
             </View>
