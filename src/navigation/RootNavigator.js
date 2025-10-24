@@ -3,7 +3,7 @@ import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
 import EventsScreen from '@/screens/EventsScreen';
 import HomeScreen from '@/screens/HomeScreen';
-import LoginScreen from '@/screens/LoginScreen';
+import LoginOrSignUpScreen from '@/screens/LoginOrSignUpScreen';
 import MessagesScreen from '@/screens/MessagesScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,7 +14,7 @@ import { useState } from 'react';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function Tabs({ loggedIn, setLoggedIn }) {
+function Tabs({ loggedIn }) {
   // Tabs now receives auth state via props (provided by RootNavigator)
   if (loggedIn) {
     return (
@@ -44,7 +44,7 @@ function Tabs({ loggedIn, setLoggedIn }) {
       </Tab.Navigator>
     );
   } else {
-    return <LoginScreen />;
+    return <LoginOrSignUpScreen />;
   }
 }
 
@@ -55,7 +55,7 @@ export default function RootNavigator() {
     <AuthContext.Provider value={{ loggedIn, setLoggedIn }}>
       <Stack.Navigator>
         <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-          {() => <Tabs loggedIn={loggedIn} setLoggedIn={setLoggedIn} />}
+          {() => <Tabs loggedIn={loggedIn} />}
         </Stack.Screen>
         <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom' }} />
       </Stack.Navigator>
