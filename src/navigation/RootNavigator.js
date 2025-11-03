@@ -1,4 +1,4 @@
-import { AuthContext } from '@/context/AuthContext';
+import { TokenContext } from '@/context/AuthContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
 import EventsScreen from '@/screens/EventsScreen';
@@ -14,9 +14,9 @@ import { useState } from 'react';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function Tabs({ loggedIn }) {
+function Tabs({ accessToken }) {
   // Tabs now receives auth state via props (provided by RootNavigator)
-  if (loggedIn) {
+  if (accessToken) {
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -49,16 +49,16 @@ function Tabs({ loggedIn }) {
 }
 
 export default function RootNavigator() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [accessToken, setAccessToken] = useState('');
 
   return (
-    <AuthContext.Provider value={{ loggedIn, setLoggedIn }}>
+    <TokenContext.Provider value={{ accessToken, setAccessToken }}>
       <Stack.Navigator>
         <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-          {() => <Tabs loggedIn={loggedIn} />}
+          {() => <Tabs accessToken={accessToken} />}
         </Stack.Screen>
         <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom' }} />
       </Stack.Navigator>
-    </AuthContext.Provider>
+    </TokenContext.Provider>
   );
 }

@@ -1,9 +1,10 @@
+import * as Apis from "@/ApiInteraction";
 import ScreenContainer from "@/components/ScreenContainer";
-import { useAuth } from "@/context/AuthContext";
+import { useAccessToken } from "@/context/AuthContext";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-function LoginScreen({ setLoggedIn, setScreenToShow }) {
+function LoginScreen({ setAccessToken, setScreenToShow }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -26,7 +27,7 @@ function LoginScreen({ setLoggedIn, setScreenToShow }) {
                     secureTextEntry={true}
                 />
                 <View />
-                <TouchableOpacity style={styles.btn} onPress={() => setLoggedIn(true)}>
+                <TouchableOpacity style={styles.btn} onPress={() => setAccessToken('')}>
                     <Text style={styles.btnText}>Login</Text>
                 </TouchableOpacity>
                 <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don't have an account yet?</Text>
@@ -35,9 +36,9 @@ function LoginScreen({ setLoggedIn, setScreenToShow }) {
     );
 }
 
-function SignUpScreen({ setLoggedIn, setScreenToShow }) {
-    const [realName, setRealName] = useState('');
+function SignUpScreen({ setAccessToken, setScreenToShow }) {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVerify, setPasswordVerify] = useState('');
 
@@ -45,16 +46,16 @@ function SignUpScreen({ setLoggedIn, setScreenToShow }) {
         <ScreenContainer>
             <View style={styles.centered}>
                 <TextInput
-                    value={realName}
-                    onChangeText={setRealName}
-                    placeholder="Full Name"
+                    value={username}
+                    onChangeText={setUsername}
+                    placeholder="Username"
                     placeholderTextColor="#6b7280"
                     style={styles.input}
                 />
                 <TextInput
-                    value={username}
-                    onChangeText={setUsername}
-                    placeholder="Username"
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Full Name"
                     placeholderTextColor="#6b7280"
                     style={styles.input}
                 />
@@ -76,23 +77,30 @@ function SignUpScreen({ setLoggedIn, setScreenToShow }) {
                 />
                 <View />
                 <Text style={styles.itemText}>Passwords { password === passwordVerify ? "do" : "do not" } match</Text>
-                <TouchableOpacity style={styles.btn} onPress={() => setLoggedIn(true)}>
+                <TouchableOpacity style={styles.btn} onPress={async () => {
+                    try {
+                        const token = await Apis.sign_up(username, email, password);
+                        setAccessToken(token);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }}>
                     <Text style={styles.btnText}>Sign Up</Text>
                 </TouchableOpacity>
-                <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.LOG_IN)}>Have an account?</Text>
+                <Text style={styles.itemText} onPress={() => { setScreenToShow(Screens.LOG_IN) }}>Have an account?</Text>
             </View>
         </ScreenContainer>
     );
 }
 
 export default function LoginOrSignUpScreen() {
-    const { setLoggedIn } = useAuth();
+    const { setAccessToken } = useAccessToken();
     const [screenToShow, setScreenToShow] = useState(Screens.LOG_IN);
 
     if (screenToShow === Screens.LOG_IN) {
-        return <LoginScreen setLoggedIn={setLoggedIn} setScreenToShow={setScreenToShow} />;
+        return <LoginScreen setAccessToken={setAccessToken} setScreenToShow={setScreenToShow} />;
     } else {
-        return <SignUpScreen setLoggedIn={setLoggedIn} setScreenToShow={setScreenToShow} />;
+        return <SignUpScreen setAccessToken={setAccessToken} setScreenToShow={setScreenToShow} />;
     }
 }
 

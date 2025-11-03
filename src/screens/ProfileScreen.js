@@ -1,10 +1,10 @@
 import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
-import { useAuth } from '@/context/AuthContext';
+import { useAccessToken } from '@/context/AuthContext';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProfileScreen() {
-  const { setLoggedIn } = useAuth();
+  const { setAccessToken } = useAccessToken();
   return (
     <ScreenContainer>
       <Header title="Profile" subtitle="Account & preferences" />
@@ -25,7 +25,7 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.item}>
         <Text style={styles.itemText}>Notifications</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.item} onPress={ () => setLoggedIn(false) }>
+      <TouchableOpacity style={styles.item} onPress={ () => setAccessToken('') }>
         <Text style={styles.itemText}>Log Out</Text>
       </TouchableOpacity>
     </ScreenContainer>
