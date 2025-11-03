@@ -1,19 +1,48 @@
-export async function sign_up(username, email, password) {
-    const response = await fetch('http://localhost:8000/api/auth/register', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            'email': email,
-            'username': username,
-            'password': password,
-        }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-        throw new Error(result.error);
+class Apis {
+    constructor() {
+        this.baseUrl = 'http://localhost:8000/api';
     }
-    return await result.access_token;
+
+    async sign_up(username, email, password) {
+        const response = await fetch(`${this.baseUrl}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'email': email,
+                'username': username,
+                'password': password,
+            }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result.access_token;
+    }
+
+    async login(email, password) {
+        const response = await fetch(`${this.baseUrl}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                'email': email,
+                'password': password,
+            }),
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result.access_token;
+    }
 }
+
+// Export a singleton instance
+export default new Apis();

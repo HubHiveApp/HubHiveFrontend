@@ -1,19 +1,19 @@
-import * as Apis from "@/ApiInteraction";
+import Apis from '@/ApiInteraction';
 import ScreenContainer from "@/components/ScreenContainer";
 import { useAccessToken } from "@/context/AuthContext";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 function LoginScreen({ setAccessToken, setScreenToShow }) {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     return (
         <ScreenContainer>
             <View style={styles.centered}>
                 <TextInput
-                    value={username}
-                    onChangeText={setUsername}
+                    value={email}
+                    onChangeText={setEmail}
                     placeholder="Username"
                     placeholderTextColor="#6b7280"
                     style={styles.input}
@@ -27,7 +27,14 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
                     secureTextEntry={true}
                 />
                 <View />
-                <TouchableOpacity style={styles.btn} onPress={() => setAccessToken('')}>
+                <TouchableOpacity style={styles.btn} onPress={async () => {
+                    try {
+                        const token = await Apis.login(email, password);
+                        setAccessToken(token);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }}>
                     <Text style={styles.btnText}>Login</Text>
                 </TouchableOpacity>
                 <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don't have an account yet?</Text>
