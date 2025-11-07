@@ -1,6 +1,6 @@
-import React from 'react';
 import ScreenContainer from '@/components/ScreenContainer';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import React from 'react';
+import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const seed = [
   { id: 'm1', author: 'Sai', text: 'Hi' },
@@ -32,18 +32,35 @@ export default function ChatroomDetailScreen() {
         )}
       />
 
-      <View style={styles.inputWrap}>
-        <TextInput
-          value={text}
-          onChangeText={setText}
-          placeholder="Message"
-          placeholderTextColor="#6b7280"
-          style={styles.input}
-        />
-        <TouchableOpacity onPress={send} style={styles.send}>
-          <Text style={styles.sendText}>Send</Text>
-        </TouchableOpacity>
-      </View>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 110 : 0}
+        style={{ width: '100%' }}
+      >
+        <View style={styles.inputWrap}>
+          <TextInput
+            value={text}
+            onChangeText={setText}
+            placeholder="Message"
+            placeholderTextColor="#6b7280"
+            style={styles.input}
+            onSubmitEditing={send}
+            spellCheck={true}
+            autoFocus={true}
+            autoCapitalize={'sentences'}
+            returnKeyType='send'
+            enablesReturnKeyAutomatically={true}
+            submitBehavior='submit'
+          />
+          <TouchableOpacity 
+            onPress={send} 
+            style={[styles.send, text.trim() === '' && styles.sendDisabled]} 
+            disabled={text.trim() === ''}
+          >
+            <Text style={styles.sendText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </ScreenContainer>
   );
 }
@@ -77,6 +94,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1f2937'
   },
-  send: { backgroundColor: '#38bdf8', borderRadius: 999, paddingHorizontal: 16, paddingVertical: 10 },
+  send: { 
+    backgroundColor: '#38bdf8', 
+    borderRadius: 999, 
+    paddingHorizontal: 16, 
+    paddingVertical: 10,
+    opacity: 1
+  },
+  sendDisabled: {
+    opacity: 0.5
+  },
   sendText: { color: '#0b1220', fontWeight: '700' }
 });
