@@ -42,6 +42,21 @@ class Apis {
         }
         return result.access_token;
     }
+
+    async get_profile(token) {
+        const response = await fetch(`${this.baseUrl}/auth/profile`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result;
+    }
 }
 
 // Export a singleton instance

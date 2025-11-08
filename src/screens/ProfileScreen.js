@@ -1,18 +1,37 @@
+import ApiInteraction from '@/ApiInteraction';
 import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProfileScreen() {
-  const { setAccessToken } = useAccessToken();
+  const { accessToken, setAccessToken } = useAccessToken();
+  const [username, setUsername] = useState('unknown');
+  const [email, setEmail] = useState('No email');
+  const [name, setName] = useState('Unnamed');
+
+  useFocusEffect(
+    useCallback(() => {
+      ApiInteraction.get_profile(accessToken).then((bio) => {
+        console.log(bio)
+        setUsername(bio.user.username);
+        setEmail(bio.user.email)
+        setName(bio.user.name ?? 'Unnamed');
+      });
+      return () => { }
+    }, [accessToken, setUsername, setEmail, setName])
+  );
+
   return (
     <ScreenContainer>
       <Header title="Profile" subtitle="Account & preferences" />
       <View style={styles.row}>
         <Image source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>Brian Yin</Text>
-          <Text style={styles.meta}>@brian • bzy205@nyu.edu</Text>
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.meta}>@{username} • {email}</Text>
         </View>
       </View>
 
