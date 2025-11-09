@@ -12,7 +12,7 @@ export default function EditProfileScreen({ route, navigation }) {
     const { profile } = route.params;
 
     const updateProfile = async () => {
-        var to_update = { username };
+        let to_update = { username };
         if (bio !== profile.user.bio) {
             to_update = { ...to_update, bio };
         }
