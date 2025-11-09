@@ -92,6 +92,23 @@ class Apis {
         }
         return result.chatrooms;
     }
+
+    async join_chatroom(token, room_id) {
+        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+        console.log(result);
+
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result;
+    }
 }
 
 // Export a singleton instance
