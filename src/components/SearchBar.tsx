@@ -1,8 +1,14 @@
-import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, TextInput, View } from 'react-native';
 
-export default function SearchBar({ value, onChangeText, placeholder = 'Search' }) {
+interface SearchBarProps {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+}
+
+export default function SearchBar({ value, onChangeText, placeholder = 'Search' }: SearchBarProps) {
   return (
     <View style={styles.box}>
       <Ionicons name="search" size={18} color="#9ca3af" />
@@ -16,6 +22,7 @@ export default function SearchBar({ value, onChangeText, placeholder = 'Search' 
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   box: {
     flexDirection: 'row',

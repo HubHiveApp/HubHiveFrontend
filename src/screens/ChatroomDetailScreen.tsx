@@ -2,13 +2,19 @@ import ScreenContainer from '@/components/ScreenContainer';
 import React from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const seed = [
+interface Message {
+  id: string;
+  author: string;
+  text: string;
+}
+
+const seed: Message[] = [
   { id: 'm1', author: 'Sai', text: 'Hi' },
   { id: 'm2', author: 'Andy', text: 'Hello' }
 ];
 
 export default function ChatroomDetailScreen() {
-  const [messages, setMessages] = React.useState(seed);
+  const [messages, setMessages] = React.useState<Message[]>(seed);
   const [text, setText] = React.useState('');
 
   function send() {

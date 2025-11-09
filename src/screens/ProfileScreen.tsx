@@ -3,23 +3,41 @@ import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ProfileScreen({ navigation }) {
+interface User {
+  username: string;
+  email: string;
+  name?: string;
+  bio?: string;
+}
+
+interface Profile {
+  user: User;
+}
+
+type RootStackParamList = {
+  EditProfile: { profile: Profile };
+};
+
+type Props = NativeStackScreenProps<RootStackParamList>;
+
+export default function ProfileScreen({ navigation }: Props) {
   const { accessToken, setAccessToken } = useAccessToken();
   const [username, setUsername] = useState('unknown');
   const [email, setEmail] = useState('No email');
   const [name, setName] = useState('Unnamed');
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useFocusEffect(
     useCallback(() => {
-      ApiInteraction.get_profile(accessToken).then((profile) => {
-        setProfile(profile);
-        setUsername(profile.user.username);
-        setEmail(profile.user.email)
-        setName(profile.user.name ?? 'Unnamed');
+      ApiInteraction.get_profile(accessToken).then((profileData: Profile) => {
+        setProfile(profileData);
+        setUsername(profileData.user.username);
+        setEmail(profileData.user.email);
+        setName(profileData.user.name ?? 'Unnamed');
       });
       return () => { }
     }, [accessToken])
@@ -36,7 +54,11 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate("EditProfile", { profile: profile }) }}>
+      <TouchableOpacity style={styles.item} onPress={() => { 
+        if (profile) {
+          navigation.navigate("EditProfile", { profile });
+        }
+      }}>
         <Text style={styles.itemText}>Edit profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.item}>
@@ -45,7 +67,7 @@ export default function ProfileScreen({ navigation }) {
       <TouchableOpacity style={styles.item}>
         <Text style={styles.itemText}>Notifications</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.item} onPress={ () => setAccessToken('') }>
+      <TouchableOpacity style={styles.item} onPress={() => setAccessToken('')}>
         <Text style={styles.itemText}>Log Out</Text>
       </TouchableOpacity>
     </ScreenContainer>

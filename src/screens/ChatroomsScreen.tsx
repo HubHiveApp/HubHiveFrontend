@@ -1,7 +1,7 @@
-import React from 'react';
-import ScreenContainer from '@/components/ScreenContainer';
 import Header from '@/components/Header';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import ScreenContainer from '@/components/ScreenContainer';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ChatroomsScreen() {
   return (

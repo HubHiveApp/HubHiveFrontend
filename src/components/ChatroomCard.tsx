@@ -2,7 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ChatroomCard({ name, venue, distance, members, onPress }) {
+interface ChatroomCardProps {
+  name: string;
+  venue: string;
+  distance: string;
+  members: number;
+  onPress: () => void;
+}
+
+export default function ChatroomCard({ name, venue, distance, members, onPress }: ChatroomCardProps) {
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
       <View style={{ flex: 1 }}>
@@ -17,6 +25,7 @@ export default function ChatroomCard({ name, venue, distance, members, onPress }
     </TouchableOpacity>
   );
 }
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#0f172a',
@@ -30,5 +39,6 @@ const styles = StyleSheet.create({
   },
   name: { color: '#e5e7eb', fontSize: 16, fontWeight: '600' },
   meta: { color: '#9ca3af', marginTop: 4 },
-  right: { flexDirection: 'row', alignItems: 'center', gap: 6 }
+  right: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  count: { color: '#9ca3af' }
 });

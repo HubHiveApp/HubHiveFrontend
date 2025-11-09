@@ -1,7 +1,7 @@
-import React from 'react';
-import ScreenContainer from '@/components/ScreenContainer';
 import Header from '@/components/Header';
-import { View, Text, StyleSheet } from 'react-native';
+import ScreenContainer from '@/components/ScreenContainer';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function EventsScreen() {
   return (

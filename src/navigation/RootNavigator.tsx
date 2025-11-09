@@ -15,7 +15,11 @@ import { useState } from 'react';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function Tabs({ accessToken }) {
+interface TabsProps {
+  accessToken: string;
+}
+
+function Tabs({ accessToken }: TabsProps) {
   // Tabs now receives auth state via props (provided by RootNavigator)
   if (accessToken) {
     return (
@@ -26,7 +30,7 @@ function Tabs({ accessToken }) {
           tabBarActiveTintColor: '#38bdf8',
           tabBarInactiveTintColor: '#9ca3af',
           tabBarIcon: ({ color, size }) => {
-            const map = {
+            const map: Record<string, keyof typeof Ionicons.glyphMap> = {
               Home: 'home',
               Chatrooms: 'chatbubbles',
               Messages: 'mail',
