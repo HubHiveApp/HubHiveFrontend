@@ -57,6 +57,24 @@ class Apis {
         }
         return result;
     }
+
+    async update_profile(token, changed_fields) {
+        const response = await fetch(`${this.baseUrl}/auth/profile`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(changed_fields),
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result;
+    }
 }
 
 // Export a singleton instance

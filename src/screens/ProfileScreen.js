@@ -11,15 +11,15 @@ export default function ProfileScreen({ navigation }) {
   const [username, setUsername] = useState('unknown');
   const [email, setEmail] = useState('No email');
   const [name, setName] = useState('Unnamed');
-  const [bio, setBio] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
-      ApiInteraction.get_profile(accessToken).then((bio) => {
-        setBio(bio);
-        setUsername(bio.user.username);
-        setEmail(bio.user.email)
-        setName(bio.user.name ?? 'Unnamed');
+      ApiInteraction.get_profile(accessToken).then((profile) => {
+        setProfile(profile);
+        setUsername(profile.user.username);
+        setEmail(profile.user.email)
+        setName(profile.user.name ?? 'Unnamed');
       });
       return () => { }
     }, [accessToken])
@@ -36,7 +36,7 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate("EditProfile", { bio: bio }) }}>
+      <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate("EditProfile", { profile: profile }) }}>
         <Text style={styles.itemText}>Edit profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.item}>
