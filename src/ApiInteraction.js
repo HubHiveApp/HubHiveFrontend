@@ -76,8 +76,12 @@ class Apis {
         return result;
     }
 
-    async get_chatrooms(token, coords, radius) {
-        const response = await fetch(`${this.baseUrl}/chat/rooms`, {
+    async get_chatrooms(token, lat_coord, lng_coord, max_distance) {
+        let url = new URL(`${this.baseUrl}/chat/rooms`);
+        url.searchParams.append("lat", lat_coord);
+        url.searchParams.append("lng", lng_coord);
+        url.searchParams.append("max_distance", max_distance);
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
