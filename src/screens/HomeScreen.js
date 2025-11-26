@@ -40,7 +40,6 @@ export default function HomeScreen({ navigation }) {
     useCallback(() => {
       ApiInteraction.get_chatrooms(accessToken, coordinates[1], coordinates[2], 1).then((receivedChatrooms) => {
         setList(receivedChatrooms);
-        receivedChatrooms.forEach((chatroom) => console.log(chatroom.location));
       })
     }, [])
   );

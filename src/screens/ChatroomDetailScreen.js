@@ -1,5 +1,8 @@
+import ApiInteraction from '@/ApiInteraction';
 import ScreenContainer from '@/components/ScreenContainer';
-import React from 'react';
+import { useAccessToken } from '@/context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const seed = [
@@ -7,7 +10,10 @@ const seed = [
   { id: 'm2', author: 'Andy', text: 'Hello' }
 ];
 
-export default function ChatroomDetailScreen() {
+export default function ChatroomDetailScreen({ route }) {
+  const { accessToken, setAccessToken } = useAccessToken();
+  const { id } = route.params;
+
   const [messages, setMessages] = React.useState(seed);
   const [text, setText] = React.useState('');
 
@@ -16,6 +22,14 @@ export default function ChatroomDetailScreen() {
     setMessages(prev => [{ id: Math.random().toString(), author: 'You', text }, ...prev]);
     setText('');
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      ApiInteraction.get_messages_in_chatroom(accessToken, id).then((recieved_msgs) => {
+        console.log(recieved_msgs);
+      })
+    }, [])
+  );
 
   return (
     <ScreenContainer padded={false}>

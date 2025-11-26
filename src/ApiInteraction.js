@@ -106,7 +106,7 @@ class Apis {
         });
 
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
 
         if (!response.ok) {
             throw new Error(result.error);
@@ -123,13 +123,29 @@ class Apis {
         });
 
         const result = await response.json();
-        console.log(result);
 
         if (!response.ok) {
             throw new Error(result.error);
         }
 
-        console.log(result);
+        return result;
+    }
+
+    async get_messages_in_chatroom(token, room_id) {
+        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}/messages`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.log(result.error);
+            throw new Error(result.error);
+        }
+
         return result;
     }
 }
