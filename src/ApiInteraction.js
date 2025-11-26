@@ -89,7 +89,7 @@ class Apis {
         });
 
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
 
         if (!response.ok) {
             throw new Error(result.error);
@@ -98,7 +98,7 @@ class Apis {
     }
 
     async join_chatroom(token, room_id) {
-        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}`, {
+        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}/join`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -111,6 +111,25 @@ class Apis {
         if (!response.ok) {
             throw new Error(result.error);
         }
+        return result;
+    }
+
+    async get_chatroom(token, room_id) {
+        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+        console.log(result);
+
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+
+        console.log(result);
         return result;
     }
 }
