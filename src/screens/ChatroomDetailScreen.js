@@ -1,8 +1,8 @@
 import ApiInteraction from '@/ApiInteraction';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
-import { useEffect } from '@react-navigation/native';
-import React, { useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const seed = [
@@ -14,16 +14,39 @@ export default function ChatroomDetailScreen({ route }) {
   const { accessToken, setAccessToken } = useAccessToken();
   const { id } = route.params;
 
-  const [messages, setMessages] = React.useState(seed);
+  const [messages, setMessages] = React.useState([]);
   const [text, setText] = React.useState('');
 
   function send() {
     if (!text.trim()) return;
+    ApiInteraction.socket.send({ chatroomId: id, content: text });
     setMessages(prev => [{ id: Math.random().toString(), author: 'You', text }, ...prev]);
     setText('');
   }
 
-  useEffect(
+  useEffect(() => {
+    // Set socket token
+
+    ApiInteraction.socket.setToken(accessToken);
+
+    // Join on mount
+    ApiInteraction.socket.join(id);
+
+    // Listen for incoming messages
+    const onNewMessage = ({ message }) => {
+      setMessages((prev) => [...prev, message]);
+    };
+
+    ApiInteraction.socket.onNewMessage(onNewMessage);
+
+    // Cleanup: leave room and remove listener
+    return () => {
+      ApiInteraction.socket.leave(id);
+      ApiInteraction.socket.offNewMessage(onNewMessage);
+    };
+  }, [id]);
+
+  useFocusEffect(
     useCallback(() => {
       ApiInteraction.get_messages_in_chatroom(accessToken, id).then((recieved_msgs) => {
         console.log(recieved_msgs);
