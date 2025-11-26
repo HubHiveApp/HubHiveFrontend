@@ -2,13 +2,15 @@ import ApiInteraction from "@/ApiInteraction";
 import ScreenContainer from "@/components/ScreenContainer";
 import { useAccessToken } from "@/context/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
+import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useState } from "react";
-import { Button, StyleSheet, Text, TextInput } from "react-native";
+import { Button, Image, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 
 export default function EditProfileScreen({ route, navigation }) {
     const { accessToken, setAccessToken } = useAccessToken();
     const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
+    const [image, setImage] = useState('https://randomuser.me/api/portraits/men/1.jpg');
     const { profile } = route.params;
 
     const updateProfile = async () => {
@@ -23,6 +25,7 @@ export default function EditProfileScreen({ route, navigation }) {
         useCallback(() => {
             setUsername(profile.user.username);
             setBio(profile.user.bio);
+            console.log(profile);
         }, [])
     );
 
@@ -33,6 +36,18 @@ export default function EditProfileScreen({ route, navigation }) {
             });
         }, [username, bio])
     );
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    }
 
     return <ScreenContainer>
         <Text>Username</Text>
@@ -51,6 +66,10 @@ export default function EditProfileScreen({ route, navigation }) {
             style={styles.input}
             placeholderTextColor="#6b7280"
         />
+
+        <TouchableOpacity onPress={pickImage}>
+            <Image source={{ uri: image }} style={styles.avatar} />
+        </TouchableOpacity>
     </ScreenContainer>
 }
 
@@ -65,4 +84,5 @@ const styles = StyleSheet.create({
         borderColor: '#1f2937',
         marginBottom: 10,
     },
+    avatar: { width: 56, height: 56, borderRadius: 28 },
 })
