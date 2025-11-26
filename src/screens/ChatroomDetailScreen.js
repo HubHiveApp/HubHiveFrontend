@@ -1,7 +1,7 @@
 import ApiInteraction from '@/ApiInteraction';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
-import { useFocusEffect } from '@react-navigation/native';
+import { useEffect } from '@react-navigation/native';
 import React, { useCallback } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -23,7 +23,7 @@ export default function ChatroomDetailScreen({ route }) {
     setText('');
   }
 
-  useFocusEffect(
+  useEffect(
     useCallback(() => {
       ApiInteraction.get_messages_in_chatroom(accessToken, id).then((recieved_msgs) => {
         console.log(recieved_msgs);
