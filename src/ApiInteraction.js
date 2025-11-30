@@ -2,7 +2,8 @@ import { io } from "socket.io-client";
 
 class Apis {
     constructor() {
-        this.baseUrl = 'http://localhost:8000/api';
+        this.baseUrl = 'http://localhost:8000';
+        this.apiBaseUrl = `${this.baseUrl}/api`
         this._token = null;
         this._initSocket();
     }
@@ -93,7 +94,7 @@ class Apis {
     }
 
     async sign_up(username, email, password) {
-        const response = await fetch(`${this.baseUrl}/auth/register`, {
+        const response = await fetch(`${this.apiBaseUrl}/auth/register`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -113,7 +114,7 @@ class Apis {
     }
 
     async login(email, password) {
-        const response = await fetch(`${this.baseUrl}/auth/login`, {
+        const response = await fetch(`${this.apiBaseUrl}/auth/login`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -133,7 +134,7 @@ class Apis {
     }
 
     async get_profile(token) {
-        const response = await fetch(`${this.baseUrl}/auth/profile`, {
+        const response = await fetch(`${this.apiBaseUrl}/auth/profile`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -148,7 +149,7 @@ class Apis {
     }
 
     async update_profile(token, changed_fields) {
-        const response = await fetch(`${this.baseUrl}/auth/profile`, {
+        const response = await fetch(`${this.apiBaseUrl}/auth/profile`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -166,7 +167,7 @@ class Apis {
     }
 
     async get_chatrooms(token, lat_coord, lng_coord, max_distance) {
-        let url = new URL(`${this.baseUrl}/chat/rooms`);
+        let url = new URL(`${this.apiBaseUrl}/chat/rooms`);
         url.searchParams.append("lat", lat_coord);
         url.searchParams.append("lng", lng_coord);
         url.searchParams.append("max_distance", max_distance);
@@ -187,7 +188,7 @@ class Apis {
     }
 
     async join_chatroom(token, room_id) {
-        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}/join`, {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}/join`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -204,7 +205,7 @@ class Apis {
     }
 
     async get_chatroom(token, room_id) {
-        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}`, {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -221,7 +222,7 @@ class Apis {
     }
 
     async get_messages_in_chatroom(token, room_id) {
-        const response = await fetch(`${this.baseUrl}/chat/rooms/${room_id}/messages`, {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}/messages`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`

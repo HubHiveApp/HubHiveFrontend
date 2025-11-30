@@ -19,6 +19,7 @@ export default function ChatroomDetailScreen({ route }) {
 
   function send() {
     if (!text.trim()) return;
+    console.log('Sending message to room:', id);
     ApiInteraction.socket.send({ chatroomId: id, content: text });
     setMessages(prev => [{ id: Math.random().toString(), author: 'You', text }, ...prev]);
     setText('');
@@ -26,7 +27,6 @@ export default function ChatroomDetailScreen({ route }) {
 
   useEffect(() => {
     // Set socket token
-
     ApiInteraction.socket.setToken(accessToken);
 
     // Join on mount
@@ -34,7 +34,8 @@ export default function ChatroomDetailScreen({ route }) {
 
     // Listen for incoming messages
     const onNewMessage = ({ message }) => {
-      setMessages((prev) => [...prev, message]);
+      console.log('New message received:', message);
+      setMessages((prev) => [message, ...prev]);
     };
 
     ApiInteraction.socket.onNewMessage(onNewMessage);
@@ -44,14 +45,26 @@ export default function ChatroomDetailScreen({ route }) {
       ApiInteraction.socket.leave(id);
       ApiInteraction.socket.offNewMessage(onNewMessage);
     };
-  }, [id]);
+  }, [id, accessToken]);
 
   useFocusEffect(
     useCallback(() => {
-      ApiInteraction.get_messages_in_chatroom(accessToken, id).then((recieved_msgs) => {
-        console.log(recieved_msgs);
-      })
-    }, [])
+      // Fetch messages
+      ApiInteraction.get_messages_in_chatroom(accessToken, id).then((result) => {
+        console.log('Fetched messages:', result);
+        if (result && result.messages) {
+          const reversed = result.messages.reverse();
+          console.log('First message user_id:', reversed[0]?.user_id);
+          setMessages(reversed);
+        }
+      }).catch(err => {
+        console.error('Error fetching messages:', err);
+      });
+
+      return () => {
+        setMessages([]);
+      }
+    }, [accessToken, id])
   );
 
   return (
@@ -63,8 +76,8 @@ export default function ChatroomDetailScreen({ route }) {
         inverted
         renderItem={({ item }) => (
           <View style={styles.msg}>
-            <Text style={styles.author}>{item.author}</Text>
-            <Text style={styles.text}>{item.text}</Text>
+            <Text style={styles.author}>{item.username || item.author}</Text>
+            <Text style={styles.text}>{item.content || item.text}</Text>
           </View>
         )}
       />
