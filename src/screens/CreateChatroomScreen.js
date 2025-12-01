@@ -25,16 +25,24 @@ export default function CreateChatroomScreen({ navigation }) {
     setError('');
 
     try {
+      // Get user profile to set business_id
+      const profile = await ApiInteraction.get_profile(accessToken);
+      console.log(profile);
+      console.log(profile.user.location);
+      
       const result = await ApiInteraction.create_chatroom(accessToken, {
         name: name.trim(),
         description: description.trim(),
         max_participants: parseInt(maxParticipants) || 100,
-        is_private: isPrivate
+        is_private: isPrivate,
+        business_id: profile.user.id, // Set business_id to current user
+        location: profile.user.location
       });
 
       // Navigate back or to the new chatroom
       navigation.goBack();
     } catch (err) {
+      console.error('Create chatroom error:', err);
       setError(err.message || 'Failed to create chatroom');
     } finally {
       setLoading(false);
