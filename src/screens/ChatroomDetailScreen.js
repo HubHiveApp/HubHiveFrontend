@@ -2,7 +2,7 @@ import ApiInteraction from '@/ApiInteraction';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const seed = [
@@ -16,6 +16,7 @@ export default function ChatroomDetailScreen({ route }) {
 
   const [messages, setMessages] = React.useState([]);
   const [text, setText] = React.useState('');
+  const [loadedCount, setLoadedCount] = useState(0);
 
   function send() {
     if (!text.trim()) return;
@@ -23,6 +24,20 @@ export default function ChatroomDetailScreen({ route }) {
     ApiInteraction.socket.send({ chatroomId: id, content: text });
     setMessages(prev => [{ id: Math.random().toString(), author: 'You', text }, ...prev]);
     setText('');
+  }
+
+  function get_prev_messages() {
+    ApiInteraction.get_messages_in_chatroom(accessToken, id, messages.length)
+      .then((result) => {
+        if (result && Array.isArray(result.messages) && result.messages.length) {
+          // Backend already returns oldest -> newest, so keep order and append.
+          console.log(result.messages[0].id);
+          setMessages((prev) => [...prev, ...result.messages]);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching messages:', err);
+      });
   }
 
   useEffect(() => {
@@ -34,8 +49,9 @@ export default function ChatroomDetailScreen({ route }) {
 
     // Listen for incoming messages
     const onNewMessage = ({ message }) => {
-      console.log('New message received:', message);
-      setMessages((prev) => [message, ...prev]);
+      if (!message) return;
+      // Append to end to preserve chronological order (oldest -> newest)
+      setMessages((prev) => [...prev, message]);
     };
 
     ApiInteraction.socket.onNewMessage(onNewMessage);
@@ -50,16 +66,7 @@ export default function ChatroomDetailScreen({ route }) {
   useFocusEffect(
     useCallback(() => {
       // Fetch messages
-      ApiInteraction.get_messages_in_chatroom(accessToken, id).then((result) => {
-        console.log('Fetched messages:', result);
-        if (result && result.messages) {
-          const reversed = result.messages.reverse();
-          console.log('First message user_id:', reversed[0]?.user_id);
-          setMessages(reversed);
-        }
-      }).catch(err => {
-        console.error('Error fetching messages:', err);
-      });
+      get_prev_messages()
 
       return () => {
         setMessages([]);
@@ -73,13 +80,17 @@ export default function ChatroomDetailScreen({ route }) {
         style={{ flex: 1, padding: 16 }}
         data={messages}
         keyExtractor={(item) => item.id}
-        inverted
+        inverted={true}
         renderItem={({ item }) => (
-          <View style={styles.msg}>
+          <View
+            style={styles.msg}
+            key={item.id}>
             <Text style={styles.author}>{item.username || item.author}</Text>
             <Text style={styles.text}>{item.content || item.text}</Text>
           </View>
         )}
+        onEndReached={get_prev_messages}
+        onEndReachedThreshold={0.1}
       />
 
       <KeyboardAvoidingView 

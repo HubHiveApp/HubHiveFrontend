@@ -221,8 +221,10 @@ class Apis {
         return result;
     }
 
-    async get_messages_in_chatroom(token, room_id) {
-        const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}/messages`, {
+    async get_messages_in_chatroom(token, room_id, offset) {
+        let url = new URL(`${this.apiBaseUrl}/chat/rooms/${room_id}/messages`);
+        url.searchParams.append('offset', offset);
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
