@@ -11,56 +11,62 @@ import ProfileScreen from '@/screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function Tabs({ accessToken }) {
-  // Tabs now receives auth state via props (provided by RootNavigator)
-  let [userType, setUserType] = useState('');
+  const [userType, setUserType] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  useEffect(
-    useCallback(() => {
-      ApiInteraction.get_profile(accessToken).then((result) => {
-        setUserType(result.user.user_type);
-      })
-    }, [])
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const result = await ApiInteraction.get_profile(accessToken);
+        if (!cancelled) setUserType(result.user.user_type);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [accessToken]);
+
+  if (!accessToken) return <LoginOrSignUpScreen />;
+  if (loading) return null; // or a tiny splash/loader
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: { backgroundColor: '#0f172a', borderTopColor: '#1f2937' },
+        tabBarActiveTintColor: '#38bdf8',
+        tabBarInactiveTintColor: '#9ca3af',
+        tabBarIcon: ({ color, size }) => {
+          const map = {
+            Home: 'home',
+            Chatrooms: 'chatbubbles',
+            Messages: 'mail',
+            Events: 'calendar',
+            Profile: 'person'
+          };
+          return <Ionicons name={map[route.name]} size={size} color={color} />;
+        }
+      })}>
+      {userType === 'business'
+        ? <Tab.Screen name="Home" component={ChatroomsScreen} />
+        : <Tab.Screen name="Home" component={HomeScreen} />}
+      <Tab.Screen name="Messages" component={MessagesScreen} />
+      <Tab.Screen name="Events" component={EventsScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
   );
-
-  if (accessToken) {
-    return (
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarStyle: { backgroundColor: '#0f172a', borderTopColor: '#1f2937' },
-          tabBarActiveTintColor: '#38bdf8',
-          tabBarInactiveTintColor: '#9ca3af',
-          tabBarIcon: ({ color, size }) => {
-            const map = {
-              Home: 'home',
-              Chatrooms: 'chatbubbles',
-              Messages: 'mail',
-              Events: 'calendar',
-              Profile: 'person'
-            };
-            return <Ionicons name={map[route.name]} size={size} color={color} />;
-          }
-        })}
-      >
-        {userType === 'business' ? (
-          <Tab.Screen name="Home" component={ChatroomsScreen} />
-        ) : (
-          <Tab.Screen name="Home" component={HomeScreen} />
-        )}
-        <Tab.Screen name="Messages" component={MessagesScreen} />
-        <Tab.Screen name="Events" component={EventsScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
-    );
-  } else {
-    return <LoginOrSignUpScreen />;
-  }
 }
 
 export default function RootNavigator() {
