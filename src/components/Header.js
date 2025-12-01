@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-export default function Header({ title, subtitle }) {
+export default function Header({ title, subtitle, secondSubtitle }) {
   return (
     <View style={styles.wrap}>
       <Text style={styles.title}>{title}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      {secondSubtitle ? <Text style={styles.subtitle}>{secondSubtitle}</Text> : null}
     </View>
   );
 }
