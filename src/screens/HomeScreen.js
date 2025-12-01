@@ -51,14 +51,7 @@ export default function HomeScreen({ navigation }) {
       <ScrollView style={{ marginTop: 12 }}>
         {list.map(item => (
           <ChatroomCard key={item.id} {...item} distance={`${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`} onPress={async () => {
-            let user_in_room = await ApiInteraction.get_chatroom(accessToken, item.id);
-            let can_join = false;
-
-            if (!user_in_room) {
-              can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
-            } else {
-              can_join = true;
-            }
+            let can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
 
             if (can_join) {
               navigation.navigate('ChatroomDetail', { id: item.id })
