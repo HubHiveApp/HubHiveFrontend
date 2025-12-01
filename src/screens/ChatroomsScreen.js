@@ -6,10 +6,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ApiInteraction from '@/ApiInteraction';
+import { distanceKm } from '@/utils/distance';
 
 export default function ChatroomsScreen({ navigation }) {
   const { accessToken, setAccessToken } = useAccessToken();
   const [list, setList] = useState([]);
+  const [coordinates, setCoordinates] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -17,6 +19,10 @@ export default function ChatroomsScreen({ navigation }) {
         console.log(result);
         setList(result);
       })
+      
+      ApiInteraction.get_profile(accessToken).then((userInfo) => {
+        setCoordinates([userInfo.user.location.address, userInfo.user.location.latitude, userInfo.user.location.longitude]);
+      });
     }, [])
   );
 
@@ -38,6 +44,7 @@ export default function ChatroomsScreen({ navigation }) {
             <ChatroomCard
               key={item.id}
               {...item}
+              distance={`${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`} 
               onPress={async () => {
                 const can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
                 if (can_join) {
