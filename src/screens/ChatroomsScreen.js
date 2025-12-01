@@ -1,10 +1,24 @@
+import ChatroomCard from '@/components/ChatroomCard';
 import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ApiInteraction from '@/ApiInteraction';
 
 export default function ChatroomsScreen({ navigation }) {
   const { accessToken, setAccessToken } = useAccessToken();
+  const [list, setList] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      ApiInteraction.get_my_business_chatrooms(accessToken).then((result) => {
+        console.log(result);
+        setList(result);
+      })
+    }, [])
+  );
 
   return (
     <ScreenContainer>
@@ -14,9 +28,26 @@ export default function ChatroomsScreen({ navigation }) {
       }}>
         <Text style={styles.btnText}>+ New Chatroom</Text>
       </TouchableOpacity>
-      <View style={styles.empty}>
-        <Text style={styles.emptyText}>No rooms yet.</Text>
-      </View>
+      {list.length === 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>No rooms yet.</Text>
+        </View>
+      ) : (
+        <ScrollView style={{ marginTop: 12 }}>
+          {list.map(item => (
+            <ChatroomCard
+              key={item.id}
+              {...item}
+              onPress={async () => {
+                const can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
+                if (can_join) {
+                  navigation.navigate('ChatroomDetail', { id: item.id });
+                }
+              }}
+            />
+          ))}
+        </ScrollView>
+      )}
     </ScreenContainer>
   );
 }

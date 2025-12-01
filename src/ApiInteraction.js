@@ -266,6 +266,24 @@ class Apis {
 
         return result;
     }
+
+    // Business-owned chatrooms for the authenticated user
+    async get_my_business_chatrooms(token) {
+        const response = await fetch(`${this.apiBaseUrl}/businesses/my-chatrooms`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load owned chatrooms');
+        }
+        // Expecting backend to return { chatrooms: [...] }
+        return result.chatrooms || [];
+    }
 }
 
 // Export a singleton instance
