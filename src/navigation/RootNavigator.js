@@ -1,3 +1,4 @@
+import ApiInteraction from '@/ApiInteraction';
 import { TokenContext } from '@/context/AuthContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
@@ -9,13 +10,23 @@ import ProfileScreen from '@/screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function Tabs({ accessToken }) {
   // Tabs now receives auth state via props (provided by RootNavigator)
+  let [userType, setUserType] = useState('');
+
+  useEffect(
+    useCallback(() => {
+      ApiInteraction.get_profile(accessToken).then((result) => {
+        setUserType(result.user.user_type);
+      })
+    }, [])
+  );
+
   if (accessToken) {
     return (
       <Tab.Navigator
@@ -36,8 +47,11 @@ function Tabs({ accessToken }) {
           }
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Chatrooms" component={ChatroomsScreen} />
+        {userType === 'business' ? (
+          <Tab.Screen name="Home" component={ChatroomsScreen} />
+        ) : (
+          <Tab.Screen name="Home" component={HomeScreen} />
+        )}
         <Tab.Screen name="Messages" component={MessagesScreen} />
         <Tab.Screen name="Events" component={EventsScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
