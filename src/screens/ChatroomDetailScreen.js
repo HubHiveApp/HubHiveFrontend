@@ -2,7 +2,7 @@ import ApiInteraction from '@/ApiInteraction';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const seed = [
@@ -40,29 +40,31 @@ export default function ChatroomDetailScreen({ route }) {
       });
   }
 
-  useEffect(() => {
-    // Set socket token
-    ApiInteraction.socket.setToken(accessToken);
+  useFocusEffect(
+    useCallback(() => {
+      // Set socket token
+      ApiInteraction.socket.setToken(accessToken);
 
-    // Join on mount
-    ApiInteraction.socket.join(id);
+      // Join on mount
+      ApiInteraction.socket.join(id);
 
-    // Listen for incoming messages
-    const onNewMessage = ({ message }) => {
-      if (!message) return;
-      // Prepend new incoming message to maintain newest-first data ordering.
-      // With FlatList `inverted`, this keeps the newest message visually at the bottom.
-      setMessages((prev) => [message, ...prev]);
-    };
+      // Listen for incoming messages
+      const onNewMessage = ({ message }) => {
+        if (!message) return;
+        // Prepend new incoming message to maintain newest-first data ordering.
+        // With FlatList `inverted`, this keeps the newest message visually at the bottom.
+        setMessages((prev) => [message, ...prev]);
+      };
 
-    ApiInteraction.socket.onNewMessage(onNewMessage);
+      ApiInteraction.socket.onNewMessage(onNewMessage);
 
-    // Cleanup: leave room and remove listener
-    return () => {
-      ApiInteraction.socket.leave(id);
-      ApiInteraction.socket.offNewMessage(onNewMessage);
-    };
-  }, [id, accessToken]);
+      // Cleanup: leave room and remove listener
+      return () => {
+        ApiInteraction.socket.leave(id);
+        ApiInteraction.socket.offNewMessage(onNewMessage);
+      };
+    }, [id, accessToken])
+  );
 
   useFocusEffect(
     useCallback(() => {
