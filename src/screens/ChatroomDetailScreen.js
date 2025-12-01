@@ -2,7 +2,7 @@ import ApiInteraction from '@/ApiInteraction';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const seed = [
@@ -16,7 +16,6 @@ export default function ChatroomDetailScreen({ route }) {
 
   const [messages, setMessages] = React.useState([]);
   const [text, setText] = React.useState('');
-  const [loadedCount, setLoadedCount] = useState(0);
 
   function send() {
     if (!text.trim()) return;
@@ -27,12 +26,13 @@ export default function ChatroomDetailScreen({ route }) {
   }
 
   function get_prev_messages() {
+    console.log('grabbing prev messages on load or scroll');
     ApiInteraction.get_messages_in_chatroom(accessToken, id, messages.length)
       .then((result) => {
         if (result && Array.isArray(result.messages) && result.messages.length) {
-          // Backend already returns oldest -> newest, so keep order and append.
+          // Backend already returns oldest -> newest, but since FlatList is inverted, we want to reverse what we get
           console.log(result.messages[0].id);
-          setMessages((prev) => [...prev, ...result.messages]);
+          setMessages((prev) => [...prev, ...result.messages.reverse()]);
         }
       })
       .catch((err) => {
@@ -50,8 +50,9 @@ export default function ChatroomDetailScreen({ route }) {
     // Listen for incoming messages
     const onNewMessage = ({ message }) => {
       if (!message) return;
-      // Append to end to preserve chronological order (oldest -> newest)
-      setMessages((prev) => [...prev, message]);
+      // Prepend new incoming message to maintain newest-first data ordering.
+      // With FlatList `inverted`, this keeps the newest message visually at the bottom.
+      setMessages((prev) => [message, ...prev]);
     };
 
     ApiInteraction.socket.onNewMessage(onNewMessage);
@@ -66,11 +67,7 @@ export default function ChatroomDetailScreen({ route }) {
   useFocusEffect(
     useCallback(() => {
       // Fetch messages
-      get_prev_messages()
-
-      return () => {
-        setMessages([]);
-      }
+      get_prev_messages();
     }, [accessToken, id])
   );
 
@@ -80,7 +77,7 @@ export default function ChatroomDetailScreen({ route }) {
         style={{ flex: 1, padding: 16 }}
         data={messages}
         keyExtractor={(item) => item.id}
-        inverted={true}
+        inverted
         renderItem={({ item }) => (
           <View
             style={styles.msg}
