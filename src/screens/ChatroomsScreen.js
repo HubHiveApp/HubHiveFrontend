@@ -1,13 +1,17 @@
-import React from 'react';
-import ScreenContainer from '@/components/ScreenContainer';
 import Header from '@/components/Header';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import ScreenContainer from '@/components/ScreenContainer';
+import { useAccessToken } from '@/context/AuthContext';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ChatroomsScreen() {
+export default function ChatroomsScreen({ navigation }) {
+  const { accessToken, setAccessToken } = useAccessToken();
+
   return (
     <ScreenContainer>
       <Header title="Your chatrooms" subtitle="Create or manage rooms" />
-      <TouchableOpacity style={styles.btn}>
+      <TouchableOpacity style={styles.btn} onPress={() => {
+        navigation.navigate('CreateChatroom');
+      }}>
         <Text style={styles.btnText}>+ New Chatroom</Text>
       </TouchableOpacity>
       <View style={styles.empty}>

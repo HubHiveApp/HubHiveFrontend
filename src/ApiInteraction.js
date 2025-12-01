@@ -187,6 +187,32 @@ class Apis {
         return result.chatrooms;
     }
 
+    async create_chatroom(token, { name, description, business_id, location, is_private, max_participants }) {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                business_id,
+                location,
+                is_private,
+                max_participants
+            }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result;
+    }
+
     async join_chatroom(token, room_id) {
         const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}/join`, {
             method: 'POST',
