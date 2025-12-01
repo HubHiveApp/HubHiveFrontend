@@ -46,7 +46,7 @@ export default function HomeScreen({ navigation }) {
   
   return (
     <ScreenContainer>
-      <Header title="Nearby chatrooms" subtitle="Discover places around you" secondSubtitle={"Your current location: " + coordinates[0]} />
+      <Header title="Nearby chatrooms" subtitle="Discover chats around you" secondSubtitle={"Your current location: " + coordinates[0]} />
       <SearchBar value={q} onChangeText={setQ} placeholder="Search chatrooms or venues" />
       <ScrollView style={{ marginTop: 12 }}>
         {list.map(item => (
