@@ -47,20 +47,19 @@ export default function HomeScreen({ navigation }) {
   );
 
   useEffect(() => {
-    {
       let locationSubscription;
 
       async function setNewLocation(locationObj) {
         const { latitude, longitude } = locationObj.coords;
 
         const reverseGeocode = await Location.reverseGeocodeAsync({ latitude, longitude });
-        const name = reverseGeocode[0].name || reverseGeocode[0].formattedAddress || reverseGeocode[0].city || "Current Location";
+        const name = reverseGeocode[0]?.name || reverseGeocode[0]?.formattedAddress || reverseGeocode[0]?.city || "Current Location";
 
         setCoordinates([name, latitude, longitude]);
       }
 
       (async () => {
-        let permissionResult = await Location.getForegroundPermissionsAsync();
+        let permissionResult = await Location.requestForegroundPermissionsAsync();
 
         if (!permissionResult.granted) {
           console.log(`Status: ${permissionResult.status}`)
@@ -83,7 +82,6 @@ export default function HomeScreen({ navigation }) {
       return () => {
         locationSubscription?.remove();
       };
-    }
   }, []);
   
   return (
