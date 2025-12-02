@@ -37,7 +37,7 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
                 }}>
                     <Text style={styles.btnText}>Login</Text>
                 </TouchableOpacity>
-                <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don't have an account yet?</Text>
+                <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don&apos;t have an account yet?</Text>
             </View>
         </ScreenContainer>
     );
