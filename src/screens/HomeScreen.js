@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 
 import ApiInteraction from '@/ApiInteraction';
@@ -7,8 +7,10 @@ import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import SearchBar from '@/components/SearchBar';
 import { useAccessToken } from '@/context/AuthContext';
-import { useFocusEffect } from '@react-navigation/native';
 import { distanceKm } from '@/utils/distance';
+import { useFocusEffect } from '@react-navigation/native';
+
+import * as Location from 'expo-location';
 
 const MOCK = [
   { id: '1', name: 'Library', venue: 'Dibner Library', distance: '100 ft', members: 24 },
@@ -28,8 +30,46 @@ export default function HomeScreen({ navigation }) {
       ApiInteraction.get_chatrooms(accessToken, coordinates[1], coordinates[2], 1).then((receivedChatrooms) => {
         setList(receivedChatrooms);
       })
-    }, [])
+    }, [coordinates])
   );
+
+  useEffect(() => {
+      let locationSubscription;
+
+      async function setNewLocation(locationObj) {
+        const { latitude, longitude } = locationObj.coords;
+
+        const reverseGeocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const name = reverseGeocode[0]?.name || reverseGeocode[0]?.formattedAddress || reverseGeocode[0]?.city || "Current Location";
+
+        setCoordinates([name, latitude, longitude]);
+      }
+
+      (async () => {
+        let permissionResult = await Location.requestForegroundPermissionsAsync();
+
+        if (!permissionResult.granted) {
+          console.log(`Status: ${permissionResult.status}`)
+          return;
+        }
+
+        const currentLocation = await Location.getCurrentPositionAsync();
+
+        setNewLocation(currentLocation);
+
+        locationSubscription = await Location.watchPositionAsync({
+          accuracy: Location.LocationAccuracy.Balanced,
+          distanceInterval: 100,
+        },
+          (location) => {
+            setNewLocation(location)
+          })
+      })();
+
+      return () => {
+        locationSubscription?.remove();
+      };
+  }, []);
   
   return (
     <ScreenContainer>

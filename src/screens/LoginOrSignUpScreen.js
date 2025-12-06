@@ -11,6 +11,9 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
     return (
         <ScreenContainer>
             <View style={styles.centered}>
+
+            <Text style={styles.title}>HubHive</Text>
+
                 <TextInput
                     value={email}
                     onChangeText={setEmail}
@@ -37,7 +40,7 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
                 }}>
                     <Text style={styles.btnText}>Login</Text>
                 </TouchableOpacity>
-                <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don't have an account yet?</Text>
+                <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don&apos;t have an account yet?</Text>
             </View>
         </ScreenContainer>
     );
@@ -73,7 +76,10 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                     style={styles.input}
                     placeholderTextColor="#6b7280"
                     secureTextEntry={true}
+                    textContentType="oneTimeCode"
+                    autoComplete="off"
                 />
+
                 <TextInput
                     value={passwordVerify}
                     onChangeText={setPasswordVerify}
@@ -81,6 +87,8 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                     style={styles.input}
                     placeholderTextColor="#6b7280"
                     secureTextEntry={true}
+                    textContentType="oneTimeCode"
+                    autoComplete="off"
                 />
                 <View />
                 <Text style={styles.itemText}>Passwords { password === passwordVerify ? "do" : "do not" } match</Text>
@@ -139,5 +147,14 @@ const styles = StyleSheet.create({
         marginTop: 'auto',
         marginBottom: 'auto',
     },
-    itemText: { color: '#e5e7eb' }
+    itemText: { color: '#e5e7eb' },
+
+    title: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#e5e7eb',
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+    
 });

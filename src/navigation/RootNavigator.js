@@ -3,6 +3,7 @@ import { TokenContext } from '@/context/AuthContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
 import CreateChatroomScreen from '@/screens/CreateChatroomScreen';
+import EditProfileScreen from '@/screens/EditProfileScreen';
 import EventsScreen from '@/screens/EventsScreen';
 import HomeScreen from '@/screens/HomeScreen';
 import LoginOrSignUpScreen from '@/screens/LoginOrSignUpScreen';
@@ -11,7 +12,8 @@ import ProfileScreen from '@/screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useEffect, useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
+import { useEffect, useReducer, useState } from 'react';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -70,7 +72,15 @@ function Tabs({ accessToken }) {
 }
 
 export default function RootNavigator() {
-  const [accessToken, setAccessToken] = useState('');
+  const jwtKey = 'jwt';
+  const reducer = (_, newState) => {
+    SecureStore.setItem(jwtKey, newState);
+    return newState;
+  }
+
+  const initialState = (token) => token = SecureStore.getItem(jwtKey) ?? '';
+
+  const [accessToken, setAccessToken] = useReducer(reducer, '', initialState);
 
   return (
     <TokenContext.Provider value={{ accessToken, setAccessToken }}>
@@ -79,6 +89,7 @@ export default function RootNavigator() {
           {() => <Tabs accessToken={accessToken} />}
         </Stack.Screen>
         <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom' }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
         <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen}/>
       </Stack.Navigator>
     </TokenContext.Provider>
