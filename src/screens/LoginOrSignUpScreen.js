@@ -11,6 +11,9 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
     return (
         <ScreenContainer>
             <View style={styles.centered}>
+
+                <Text style={styles.title}>HubHive</Text>
+
                 <TextInput
                     value={email}
                     onChangeText={setEmail}
@@ -51,7 +54,11 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
 
     return (
         <ScreenContainer>
+
+
             <View style={styles.centered}>
+
+
                 <TextInput
                     value={username}
                     onChangeText={setUsername}
@@ -62,7 +69,7 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                 <TextInput
                     value={email}
                     onChangeText={setEmail}
-                    placeholder="Full Name"
+                    placeholder="Email"
                     placeholderTextColor="#6b7280"
                     style={styles.input}
                 />
@@ -73,7 +80,10 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                     style={styles.input}
                     placeholderTextColor="#6b7280"
                     secureTextEntry={true}
+                    textContentType="oneTimeCode"
+                    autoComplete="off"
                 />
+
                 <TextInput
                     value={passwordVerify}
                     onChangeText={setPasswordVerify}
@@ -81,7 +91,10 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                     style={styles.input}
                     placeholderTextColor="#6b7280"
                     secureTextEntry={true}
-                />
+                    textContentType="oneTimeCode"
+                    autoComplete="off"
+                />            
+
                 <View />
                 <Text style={styles.itemText}>Passwords { password === passwordVerify ? "do" : "do not" } match</Text>
                 <TouchableOpacity style={styles.btn} onPress={async () => {
@@ -139,5 +152,14 @@ const styles = StyleSheet.create({
         marginTop: 'auto',
         marginBottom: 'auto',
     },
-    itemText: { color: '#e5e7eb' }
+    itemText: { color: '#e5e7eb' },
+
+    title: {
+        fontSize: 36,
+        fontWeight: '800',
+        color: '#e5e7eb',
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+
 });

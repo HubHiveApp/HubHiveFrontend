@@ -4,73 +4,117 @@ import { useAccessToken } from "@/context/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useState } from "react";
-import { Button, Image, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import { Alert, Button, StyleSheet, Text, TextInput, View, ActivityIndicator } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function EditProfileScreen({ route, navigation }) {
-    const { accessToken, setAccessToken } = useAccessToken();
+    const { accessToken } = useAccessToken();
     const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
-    const [image, setImage] = useState('https://randomuser.me/api/portraits/men/1.jpg');
-    const { profile } = route.params;
+    const [uploading, setUploading] = useState(false);
+
+    const { profile } = route.params; // profile = { user: {...} }
 
     const updateProfile = async () => {
-        let to_update = { username };
-        if (bio !== profile.user.bio) {
-            to_update = { ...to_update, bio };
+        try {
+            let to_update = { username };
+            if (bio !== profile.user.bio) {
+                to_update = { ...to_update, bio };
+            }
+            await ApiInteraction.update_profile(accessToken, to_update);
+            Alert.alert("Success", "Profile updated.");
+        } catch (err) {
+            console.log(err);
+            Alert.alert("Error", err.message || "Failed to update profile.");
         }
-        const response = await ApiInteraction.update_profile(accessToken, to_update);
-    }
+    };
 
+    // populate username/bio when screen gains focus
     useFocusEffect(
         useCallback(() => {
-            setUsername(profile.user.username);
-            setBio(profile.user.bio);
-            console.log(profile);
-        }, [])
+            if (!profile || !profile.user) return;
+            setUsername(profile.user.username || "");
+            setBio(profile.user.bio || "");
+        }, [profile])
     );
 
+    // header Save button
     useFocusEffect(
         useCallback(() => {
             navigation.setOptions({
                 headerRight: () => (<Button title="Save" onPress={updateProfile} />)
             });
-        }, [username, bio])
+        }, [navigation, username, bio])
     );
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            allowsEditing: true,
-            quality: 1,
-        });
+    const handleChangeProfilePicture = async () => {
+        try {
+            // ask for permission
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert("Permission needed", "We need access to your photos to change your profile picture.");
+                return;
+            }
 
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            // open picker
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.7,
+            });
+
+            if (result.canceled) return;
+
+            const asset = result.assets[0];
+            if (!asset?.uri) {
+                Alert.alert("Error", "No image selected.");
+                return;
+            }
+
+            setUploading(true);
+            const updated = await ApiInteraction.upload_profile_picture(accessToken, asset.uri);
+            // updated.user has new profile_picture URL if you want to use it
+            Alert.alert("Success", "Profile picture updated!");
+        } catch (err) {
+            console.log(err);
+            Alert.alert("Error", err.message || "Failed to upload profile picture.");
+        } finally {
+            setUploading(false);
         }
-    }
+    };
 
-    return <ScreenContainer>
-        <Text>Username</Text>
-        <TextInput
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Username"
-            style={styles.input}
-            placeholderTextColor="#6b7280"
-        />
-        <Text>Bio</Text>
-        <TextInput
-            value={bio}
-            onChangeText={setBio}
-            placeholder="Bio"
-            style={styles.input}
-            placeholderTextColor="#6b7280"
-        />
+    return (
+        <ScreenContainer>
 
-        <TouchableOpacity onPress={pickImage}>
-            <Image source={{ uri: image }} style={styles.avatar} />
-        </TouchableOpacity>
-    </ScreenContainer>
+
+            <Text>Username</Text>
+            <TextInput
+                value={username}
+                onChangeText={setUsername}
+                placeholder="Username"
+                style={styles.input}
+                placeholderTextColor="#6b7280"
+            />
+
+            <Text>Bio</Text>
+            <TextInput
+                value={bio}
+                onChangeText={setBio}
+                placeholder="Bio"
+                style={styles.input}
+                placeholderTextColor="#6b7280"
+            />
+
+            <View style={{ marginBottom: 16 }}>
+                {uploading ? (
+                    <ActivityIndicator />
+                ) : (
+                    <Button title="Change profile picture" onPress={handleChangeProfilePicture} />
+                )}
+            </View>
+        </ScreenContainer>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -84,5 +128,4 @@ const styles = StyleSheet.create({
         borderColor: '#1f2937',
         marginBottom: 10,
     },
-    avatar: { width: 56, height: 56, borderRadius: 28 },
-})
+});
