@@ -11,6 +11,7 @@ export default function ProfileScreen({ navigation }) {
   const [username, setUsername] = useState('unknown');
   const [email, setEmail] = useState('No email');
   const [profile, setProfile] = useState(null);
+  const [profilePictureHash, setProfilePictureHash] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -18,7 +19,10 @@ export default function ProfileScreen({ navigation }) {
         setProfile(profile);
         setUsername(profile.user.username);
         setEmail(profile.user.email)
-        setName(profile.user.name ?? 'Unnamed');
+      });
+
+      ApiInteraction.get_profile_picture_hash(accessToken).then((hash) => {
+        setProfilePictureHash(hash);
       });
       return () => { }
     }, [accessToken])
@@ -26,12 +30,13 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <ScreenContainer>
-      <Header title="Profile" subtitle="Account & preferences" />
+      <Header title="Profile" subtitle="Account & preferences"/>
       <View style={styles.row}>
-      <Image
+        <Image
+          key={profilePictureHash}
           source={
               profile?.user?.profile_picture
-              ? { uri: `http://localhost:8000${profile.user.profile_picture}` } // or your IP/host
+              ? { uri: `http://localhost:8000/${profile.user.profile_picture}`} // or your IP/host
             : { uri: 'https://randomuser.me/api/portraits/men/1.jpg' } // fallback
           }
   style={styles.avatar}

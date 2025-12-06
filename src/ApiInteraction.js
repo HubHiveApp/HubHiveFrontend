@@ -240,6 +240,7 @@ class Apis {
 
         return result;
     }
+
     async upload_profile_picture(token, imageUri) {
         const formData = new FormData();
     
@@ -268,6 +269,20 @@ class Apis {
         return result;
     }
     
+    async get_profile_picture_hash(token) {
+        const response = await fetch(`${this.apiBaseUrl}/auth/profile/picture/hash`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to get image hash');
+        }
+        return result.hash;
+    }
 }
 
 // Export a singleton instance
