@@ -32,6 +32,9 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "extra": {
+      "baseUrl": "http://localhost:8000"
+    },
     "plugins": [
       "expo-router",
       [
