@@ -10,43 +10,28 @@ export default function ProfileScreen({ navigation }) {
   const { accessToken, setAccessToken } = useAccessToken();
   const [username, setUsername] = useState('unknown');
   const [email, setEmail] = useState('No email');
+  const [name, setName] = useState('Unnamed');
   const [profile, setProfile] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
-      ApiInteraction.get_profile(accessToken)
-        .then((profile) => {
-          setProfile(profile);
-          setUsername(profile.user.username);
-          setEmail(profile.user.email);
-          setName(profile.user.name ?? "Unnamed");
-        })
-        .catch((err) => {
-          console.log("Failed to load profile:", err);
-        });
-  
-      return () => {};
+      ApiInteraction.get_profile(accessToken).then((profile) => {
+        setProfile(profile);
+        setUsername(profile.user.username);
+        setEmail(profile.user.email)
+        setName(profile.user.name ?? 'Unnamed');
+      });
+      return () => { }
     }, [accessToken])
   );
-
-  const API_ROOT = "http://localhost:8000";
-
-// If running on a real phone using Expo Go, replace with your LAN IP:
-// const API_ROOT = "http://192.168.x.x:8000";
-
-  // Build the avatar URL dynamically:
-  const avatarUri =
-    profile?.user?.profile_picture
-      ? `${API_ROOT}${profile.user.profile_picture}` // e.g. http://localhost:8000/static/avatars/1.jpg
-      : "https://randomuser.me/api/portraits/men/1.jpg"; // fallback
 
   return (
     <ScreenContainer>
       <Header title="Profile" subtitle="Account & preferences" />
       <View style={styles.row}>
-        <Image source={{ uri: avatarUri }} style={styles.avatar} />
-      <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{username}</Text>
+        <Image source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.name}>{name}</Text>
           <Text style={styles.meta}>@{username} • {email}</Text>
         </View>
       </View>

@@ -166,35 +166,80 @@ class Apis {
         return result;
     }
 
-    async upload_profile_picture(token, imageUri) {
-        const formData = new FormData();
-    
-        const uriParts = imageUri.split('/');
-        const filename = uriParts[uriParts.length - 1] || 'avatar.jpg';
-    
-        formData.append('file', {
-            // @ts-ignore (if you’re using TS, this silences RN FormData typing)
-            uri: imageUri,
-            name: filename,
-            type: 'image/jpeg', // backend accepts jpeg/png/webp; jpeg is a safe default
+    async get_chatrooms(token, lat_coord, lng_coord, max_distance) {
+        let url = new URL(`${this.apiBaseUrl}/chat/rooms`);
+        url.searchParams.append("lat", lat_coord);
+        url.searchParams.append("lng", lng_coord);
+        url.searchParams.append("max_distance", max_distance);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
         });
-    
-        const response = await fetch(`${this.baseUrl}/auth/profile/picture`, {
+
+        const result = await response.json();
+        // console.log(result);
+
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+        return result.chatrooms;
+    }
+
+    async join_chatroom(token, room_id) {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}/join`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                // DO NOT set Content-Type here; fetch will handle multipart boundary
+                'Authorization': `Bearer ${token}`
             },
-            body: formData,
         });
-    
+
         const result = await response.json();
+        // console.log(result);
+
         if (!response.ok) {
-            throw new Error(result.error || 'Failed to upload profile picture');
+            throw new Error(result.error);
         }
-        return result; // backend returns { message, user }
+        return result;
     }
-    
+
+    async get_chatroom(token, room_id) {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error);
+        }
+
+        return result;
+    }
+
+    async get_messages_in_chatroom(token, room_id, offset) {
+        let url = new URL(`${this.apiBaseUrl}/chat/rooms/${room_id}/messages`);
+        url.searchParams.append('offset', offset);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.log(result.error);
+            throw new Error(result.error);
+        }
+
+        return result;
+    }
 }
 
 // Export a singleton instance
