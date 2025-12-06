@@ -10,7 +10,8 @@ import ProfileScreen from '@/screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
+import { useReducer } from 'react';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -50,7 +51,15 @@ function Tabs({ accessToken }) {
 }
 
 export default function RootNavigator() {
-  const [accessToken, setAccessToken] = useState('');
+  const jwtKey = 'jwt';
+  const reducer = (_, newState) => {
+    SecureStore.setItem(jwtKey, newState);
+    return newState;
+  }
+
+  const initialState = (token) => token = SecureStore.getItem(jwtKey) ?? '';
+
+  const [accessToken, setAccessToken] = useReducer(reducer, '', initialState);
 
   return (
     <TokenContext.Provider value={{ accessToken, setAccessToken }}>
