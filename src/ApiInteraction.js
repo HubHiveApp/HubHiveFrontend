@@ -240,6 +240,34 @@ class Apis {
 
         return result;
     }
+    async upload_profile_picture(token, imageUri) {
+        const formData = new FormData();
+    
+        const uriParts = imageUri.split('/');
+        const filename = uriParts[uriParts.length - 1] || 'avatar.jpg';
+    
+        formData.append('file', {
+            uri: imageUri,
+            name: filename,
+            type: 'image/jpeg',
+        });
+    
+        const response = await fetch(`${this.apiBaseUrl}/auth/profile/picture`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                // don't set Content-Type for multipart
+            },
+            body: formData,
+        });
+    
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to upload profile picture');
+        }
+        return result;
+    }
+    
 }
 
 // Export a singleton instance

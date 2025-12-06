@@ -10,7 +10,6 @@ export default function ProfileScreen({ navigation }) {
   const { accessToken, setAccessToken } = useAccessToken();
   const [username, setUsername] = useState('unknown');
   const [email, setEmail] = useState('No email');
-  const [name, setName] = useState('Unnamed');
   const [profile, setProfile] = useState(null);
 
   useFocusEffect(
@@ -29,9 +28,16 @@ export default function ProfileScreen({ navigation }) {
     <ScreenContainer>
       <Header title="Profile" subtitle="Account & preferences" />
       <View style={styles.row}>
-        <Image source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
+      <Image
+          source={
+              profile?.user?.profile_picture
+              ? { uri: `http://localhost:8000${profile.user.profile_picture}` } // or your IP/host
+            : { uri: 'https://randomuser.me/api/portraits/men/1.jpg' } // fallback
+          }
+  style={styles.avatar}
+/>
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.name}>{username}</Text>
           <Text style={styles.meta}>@{username} • {email}</Text>
         </View>
       </View>
