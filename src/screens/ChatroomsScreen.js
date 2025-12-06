@@ -1,12 +1,12 @@
+import ApiInteraction from '@/ApiInteraction';
 import ChatroomCard from '@/components/ChatroomCard';
 import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
+import { distanceKm } from '@/utils/distance';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import ApiInteraction from '@/ApiInteraction';
-import { distanceKm } from '@/utils/distance';
 
 export default function ChatroomsScreen({ navigation }) {
   const { accessToken, setAccessToken } = useAccessToken();
@@ -16,7 +16,6 @@ export default function ChatroomsScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       ApiInteraction.get_my_business_chatrooms(accessToken).then((result) => {
-        console.log(result);
         setList(result);
       })
       
@@ -34,26 +33,32 @@ export default function ChatroomsScreen({ navigation }) {
       }}>
         <Text style={styles.btnText}>+ New Chatroom</Text>
       </TouchableOpacity>
-      {list.length === 0 ? (
+      {(list.length === 0) ? (
         <View style={styles.empty}>
           <Text style={styles.emptyText}>No rooms yet.</Text>
         </View>
       ) : (
-        <ScrollView style={{ marginTop: 12 }}>
-          {list.map(item => (
-            <ChatroomCard
-              key={item.id}
-              {...item}
-              distance={`${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`} 
-              onPress={async () => {
-                const can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
-                if (can_join) {
-                  navigation.navigate('ChatroomDetail', { id: item.id });
-                }
-              }}
-            />
-          ))}
-        </ScrollView>
+        (coordinates[1] !== undefined && coordinates[2] !== undefined) ? (
+          <ScrollView style={{ marginTop: 12 }}>
+            {list.map(item => (
+              <ChatroomCard
+                key={item.id}
+                {...item}
+                distance={`${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`} 
+                onPress={async () => {
+                  const can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
+                  if (can_join) {
+                    navigation.navigate('ChatroomDetail', { id: item.id });
+                  }
+                }}
+              />
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>Loading location...</Text>
+          </View>
+        )
       )}
     </ScreenContainer>
   );

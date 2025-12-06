@@ -27,9 +27,7 @@ export default function CreateChatroomScreen({ navigation }) {
     try {
       // Get user profile to set business_id
       const profile = await ApiInteraction.get_profile(accessToken);
-      console.log(profile);
-      console.log(profile.user.location);
-      
+
       const result = await ApiInteraction.create_chatroom(accessToken, {
         name: name.trim(),
         description: description.trim(),
