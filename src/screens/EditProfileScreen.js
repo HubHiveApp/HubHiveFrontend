@@ -46,7 +46,7 @@ export default function EditProfileScreen({ route, navigation }) {
             navigation.setOptions({
                 headerRight: () => (<Button title="Save" onPress={updateProfile} />)
             });
-        }, [navigation, username, bio, editedProfilePic])
+        }, [navigation, updateProfile])
     );
 
     const handleChangeProfilePicture = async () => {
@@ -84,8 +84,8 @@ export default function EditProfileScreen({ route, navigation }) {
     return (
         <ScreenContainer>
             <Pressable onPress={handleChangeProfilePicture} style={{ marginHorizontal: 'auto' }} >
-                <Image source={{ uri: editedProfilePic?.uri ?? `http://localhost:8000/${profile.user.profile_picture}` }} style={styles.avatar} />
-                <Button title="Change Profile Photo" onPress={handleChangeProfilePicture}>Change Profile Photo</Button>
+                <Image source={{ uri: editedProfilePic?.uri ?? `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` }} style={styles.avatar} />
+                <Button title="Change Profile Photo" onPress={handleChangeProfilePicture} />
             </Pressable>
             <Text style={styles.itemText}>Username</Text>
             <TextInput

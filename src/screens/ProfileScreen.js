@@ -18,7 +18,7 @@ export default function ProfileScreen({ navigation }) {
       ApiInteraction.get_profile(accessToken).then((profile) => {
         setProfile(profile);
         setUsername(profile.user.username);
-        setEmail(profile.user.email)
+        setEmail(profile.user.email);
       });
 
       ApiInteraction.get_profile_picture_hash(accessToken).then((hash) => {
@@ -35,9 +35,9 @@ export default function ProfileScreen({ navigation }) {
         <Image
           key={profilePictureHash}
           source={
-              profile?.user?.profile_picture
-              ? { uri: `http://localhost:8000/${profile.user.profile_picture}`} // or your IP/host
-            : { uri: 'https://randomuser.me/api/portraits/men/1.jpg' } // fallback
+            profile?.user?.profile_picture
+              ? { uri: `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` }
+              : { uri: 'https://randomuser.me/api/portraits/men/1.jpg' } // fallback
           }
   style={styles.avatar}
 />
