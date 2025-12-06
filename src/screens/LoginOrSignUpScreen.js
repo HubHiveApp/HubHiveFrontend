@@ -2,7 +2,7 @@ import Apis from '@/ApiInteraction';
 import ScreenContainer from "@/components/ScreenContainer";
 import { useAccessToken } from "@/context/AuthContext";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 function LoginScreen({ setAccessToken, setScreenToShow }) {
     const [email, setEmail] = useState('');
@@ -10,38 +10,50 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
 
     return (
         <ScreenContainer>
-            <View style={styles.centered}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ width: '100%', flex: 1 }}
+            >
+                <View style={styles.centered}>
 
-            <Text style={styles.title}>HubHive</Text>
+                    <Text style={styles.title}>HubHive</Text>
 
-                <TextInput
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="Username"
-                    placeholderTextColor="#6b7280"
-                    style={styles.input}
-                />
-                <TextInput
-                    value={password}
-                    onChangeText={setPassword}
-                    placeholder="Password"
-                    style={styles.input}
-                    placeholderTextColor="#6b7280"
-                    secureTextEntry={true}
-                />
-                <View />
-                <TouchableOpacity style={styles.btn} onPress={async () => {
-                    try {
-                        const token = await Apis.login(email, password);
-                        setAccessToken(token);
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }}>
-                    <Text style={styles.btnText}>Login</Text>
-                </TouchableOpacity>
-                <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don&apos;t have an account yet?</Text>
-            </View>
+                    <TextInput
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="Username"
+                        placeholderTextColor="#6b7280"
+                        style={styles.input}
+                        keyboardType='email-address'
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        textContentType='username'
+                        returnKeyType='next'
+                    />
+                    <TextInput
+                        value={password}
+                        onChangeText={setPassword}
+                        placeholder="Password"
+                        style={styles.input}
+                        placeholderTextColor="#6b7280"
+                        secureTextEntry={true}
+                        textContentType='password'
+                        returnKeyType='done'
+                    />
+                    <View />
+                    <TouchableOpacity style={styles.btn} onPress={async () => {
+                        try {
+                            const token = await Apis.login(email, password);
+                            setAccessToken(token);
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }}>
+                        <Text style={styles.btnText}>Login</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don&apos;t have an account yet?</Text>
+                </View>
+            </KeyboardAvoidingView>
         </ScreenContainer>
     );
 }
@@ -54,56 +66,71 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
 
     return (
         <ScreenContainer>
-            <View style={styles.centered}>
-                <TextInput
-                    value={username}
-                    onChangeText={setUsername}
-                    placeholder="Username"
-                    placeholderTextColor="#6b7280"
-                    style={styles.input}
-                />
-                <TextInput
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="Full Name"
-                    placeholderTextColor="#6b7280"
-                    style={styles.input}
-                />
-                <TextInput
-                    value={password}
-                    onChangeText={setPassword}
-                    placeholder="Password"
-                    style={styles.input}
-                    placeholderTextColor="#6b7280"
-                    secureTextEntry={true}
-                    textContentType="oneTimeCode"
-                    autoComplete="off"
-                />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ width: '100%', flex: 1 }}
+            >
+                <View style={styles.centered}>
+                    <TextInput
+                        value={username}
+                        onChangeText={setUsername}
+                        placeholder="Username"
+                        placeholderTextColor="#6b7280"
+                        style={styles.input}
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        autoComplete='off'
+                        textContentType='username'
+                        returnKeyType='next'
+                    />
+                    <TextInput
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="Email"
+                        placeholderTextColor="#6b7280"
+                        style={styles.input}
+                        keyboardType='email-address'
+                        textContentType='emailAddress'
+                        returnKeyType='next'
+                    />
+                    <TextInput
+                        value={password}
+                        onChangeText={setPassword}
+                        placeholder="Password"
+                        style={styles.input}
+                        placeholderTextColor="#6b7280"
+                        secureTextEntry={true}
+                        textContentType="newPassword"
+                        autoComplete="off"
+                        returnKeyType='next'
+                    />
 
-                <TextInput
-                    value={passwordVerify}
-                    onChangeText={setPasswordVerify}
-                    placeholder="Verify password"
-                    style={styles.input}
-                    placeholderTextColor="#6b7280"
-                    secureTextEntry={true}
-                    textContentType="oneTimeCode"
-                    autoComplete="off"
-                />
-                <View />
-                <Text style={styles.itemText}>Passwords { password === passwordVerify ? "do" : "do not" } match</Text>
-                <TouchableOpacity style={styles.btn} onPress={async () => {
-                    try {
-                        const token = await Apis.sign_up(username, email, password);
-                        setAccessToken(token);
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }}>
-                    <Text style={styles.btnText}>Sign Up</Text>
-                </TouchableOpacity>
-                <Text style={styles.itemText} onPress={() => { setScreenToShow(Screens.LOG_IN) }}>Have an account?</Text>
-            </View>
+                    <TextInput
+                        value={passwordVerify}
+                        onChangeText={setPasswordVerify}
+                        placeholder="Verify password"
+                        style={styles.input}
+                        placeholderTextColor="#6b7280"
+                        secureTextEntry={true}
+                        textContentType="newPassword"
+                        autoComplete="off"
+                        returnKeyType='done'
+                    />
+                    <View />
+                    <Text style={styles.itemText}>Passwords {password === passwordVerify ? "do" : "do not"} match</Text>
+                    <TouchableOpacity style={styles.btn} onPress={async () => {
+                        try {
+                            const token = await Apis.sign_up(username, email, password);
+                            setAccessToken(token);
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }}>
+                        <Text style={styles.btnText}>Sign Up</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.itemText} onPress={() => { setScreenToShow(Screens.LOG_IN) }}>Have an account?</Text>
+                </View>
+            </KeyboardAvoidingView>
         </ScreenContainer>
     );
 }
