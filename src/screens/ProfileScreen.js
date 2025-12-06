@@ -1,22 +1,53 @@
+import ApiInteraction from '@/ApiInteraction';
 import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ProfileScreen() {
-  const { setAccessToken } = useAccessToken();
+export default function ProfileScreen({ navigation }) {
+  const { accessToken, setAccessToken } = useAccessToken();
+  const [username, setUsername] = useState('unknown');
+  const [email, setEmail] = useState('No email');
+  const [profile, setProfile] = useState(null);
+  const [profilePictureHash, setProfilePictureHash] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      ApiInteraction.get_profile(accessToken).then((profile) => {
+        setProfile(profile);
+        setUsername(profile.user.username);
+        setEmail(profile.user.email);
+      });
+
+      ApiInteraction.get_profile_picture_hash(accessToken).then((hash) => {
+        setProfilePictureHash(hash);
+      });
+      return () => { }
+    }, [accessToken])
+  );
+
   return (
     <ScreenContainer>
-      <Header title="Profile" subtitle="Account & preferences" />
+      <Header title="Profile" subtitle="Account & preferences"/>
       <View style={styles.row}>
-        <Image source={{ uri: 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
+        <Image
+          key={profilePictureHash}
+          source={
+            profile?.user?.profile_picture
+              ? { uri: `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` }
+              : { uri: 'https://randomuser.me/api/portraits/men/1.jpg' } // fallback
+          }
+  style={styles.avatar}
+/>
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>Brian Yin</Text>
-          <Text style={styles.meta}>@brian • bzy205@nyu.edu</Text>
+          <Text style={styles.name}>{username}</Text>
+          <Text style={styles.meta}>@{username} • {email}</Text>
         </View>
       </View>
 
-      <TouchableOpacity style={styles.item}>
+      <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate("EditProfile", { profile: profile }) }}>
         <Text style={styles.itemText}>Edit profile</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.item}>

@@ -1,6 +1,7 @@
 import { TokenContext } from '@/context/AuthContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
+import EditProfileScreen from '@/screens/EditProfileScreen';
 import EventsScreen from '@/screens/EventsScreen';
 import HomeScreen from '@/screens/HomeScreen';
 import LoginOrSignUpScreen from '@/screens/LoginOrSignUpScreen';
@@ -58,6 +59,7 @@ export default function RootNavigator() {
           {() => <Tabs accessToken={accessToken} />}
         </Stack.Screen>
         <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom' }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
       </Stack.Navigator>
     </TokenContext.Provider>
   );
