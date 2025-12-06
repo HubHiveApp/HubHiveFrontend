@@ -4,13 +4,13 @@ import { useAccessToken } from "@/context/AuthContext";
 import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Button, Image, Pressable, StyleSheet, Text, TextInput } from "react-native";
 
 export default function EditProfileScreen({ route, navigation }) {
     const { accessToken } = useAccessToken();
     const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
-    const [uploading, setUploading] = useState(false);
+    const [editedProfilePic, setEditedProfilePic] = useState(null);
 
     const { profile } = route.params; // profile = { user: {...} }
 
@@ -21,7 +21,10 @@ export default function EditProfileScreen({ route, navigation }) {
                 to_update = { ...to_update, bio };
             }
             await ApiInteraction.update_profile(accessToken, to_update);
-            Alert.alert("Success", "Profile updated.");
+            if (editedProfilePic) {
+                await ApiInteraction.upload_profile_picture(accessToken, editedProfilePic.uri);
+            }
+            Alert.alert("Success", "Profile updated.", [{ onPress: () => navigation.goBack() }]);
         } catch (err) {
             console.log(err);
             Alert.alert("Error", err.message || "Failed to update profile.");
@@ -43,7 +46,7 @@ export default function EditProfileScreen({ route, navigation }) {
             navigation.setOptions({
                 headerRight: () => (<Button title="Save" onPress={updateProfile} />)
             });
-        }, [navigation, username, bio])
+        }, [navigation, username, bio, editedProfilePic])
     );
 
     const handleChangeProfilePicture = async () => {
@@ -71,23 +74,20 @@ export default function EditProfileScreen({ route, navigation }) {
                 return;
             }
 
-            setUploading(true);
-            const updated = await ApiInteraction.upload_profile_picture(accessToken, asset.uri);
-            // updated.user has new profile_picture URL if you want to use it
-            Alert.alert("Success", "Profile picture updated!");
+            setEditedProfilePic(asset);
         } catch (err) {
             console.log(err);
-            Alert.alert("Error", err.message || "Failed to upload profile picture.");
-        } finally {
-            setUploading(false);
+            Alert.alert("Error", err.message || "Failed to get profile picture.");
         }
     };
 
     return (
         <ScreenContainer>
-
-
-            <Text>Username</Text>
+            <Pressable onPress={handleChangeProfilePicture} style={{ marginHorizontal: 'auto' }} >
+                <Image source={{ uri: editedProfilePic?.uri ?? `http://localhost:8000/${profile.user.profile_picture}` }} style={styles.avatar} />
+                <Button title="Change Profile Photo" onPress={handleChangeProfilePicture}>Change Profile Photo</Button>
+            </Pressable>
+            <Text style={styles.itemText}>Username</Text>
             <TextInput
                 value={username}
                 onChangeText={setUsername}
@@ -96,7 +96,7 @@ export default function EditProfileScreen({ route, navigation }) {
                 placeholderTextColor="#6b7280"
             />
 
-            <Text>Bio</Text>
+            <Text style={styles.itemText}>Bio</Text>
             <TextInput
                 value={bio}
                 onChangeText={setBio}
@@ -104,14 +104,6 @@ export default function EditProfileScreen({ route, navigation }) {
                 style={styles.input}
                 placeholderTextColor="#6b7280"
             />
-
-            <View style={{ marginBottom: 16 }}>
-                {uploading ? (
-                    <ActivityIndicator />
-                ) : (
-                    <Button title="Change profile picture" onPress={handleChangeProfilePicture} />
-                )}
-            </View>
         </ScreenContainer>
     );
 }
@@ -127,4 +119,6 @@ const styles = StyleSheet.create({
         borderColor: '#1f2937',
         marginBottom: 10,
     },
+    itemText: { color: '#e5e7eb' },
+    avatar: { width: 112, height: 112, borderRadius: 56, alignSelf: 'center' },
 });
