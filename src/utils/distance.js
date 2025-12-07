@@ -1,4 +1,7 @@
 export function distanceKm(lat1, lon1, lat2, lon2) {
+  if (!(lat1 && lat2 && lon1 && lon2)) {
+    return;
+  }
   const R = 6371.0; // Earth's radius in km
   const toRad = (deg) => (deg * Math.PI) / 180;
 

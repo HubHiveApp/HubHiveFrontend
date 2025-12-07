@@ -44,10 +44,14 @@ export default function ChatroomsScreen({ navigation }) {
               <ChatroomCard
                 key={item.id}
                 {...item}
-                distance={`${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`} 
+                distance={
+                  item.location && item.location.latitude != null && item.location.longitude != null
+                    ? `${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`
+                    : 'Unknown distance'
+                }
                 onPress={async () => {
-                  const can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
-                  if (can_join) {
+                  const canJoin = await ApiInteraction.join_chatroom(accessToken, item.id);  
+                  if (canJoin) {  
                     navigation.navigate('ChatroomDetail', { id: item.id });
                   }
                 }}
