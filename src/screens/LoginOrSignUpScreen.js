@@ -1,12 +1,22 @@
 import Apis from '@/ApiInteraction';
 import ScreenContainer from "@/components/ScreenContainer";
 import { useAccessToken } from "@/context/AuthContext";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 function LoginScreen({ setAccessToken, setScreenToShow }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const passwordRef = useRef(null);
+
+    const loginUser = async () => {
+        try {
+            const token = await Apis.login(email, password);
+            setAccessToken(token);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <ScreenContainer>
@@ -29,8 +39,11 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
                         autoCorrect={false}
                         textContentType='username'
                         returnKeyType='next'
+                        onSubmitEditing={() => passwordRef.current?.focus()}
+                        submitBehavior='submit'
                     />
                     <TextInput
+                        ref={passwordRef}
                         value={password}
                         onChangeText={setPassword}
                         placeholder="Password"
@@ -39,16 +52,10 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
                         secureTextEntry={true}
                         textContentType='password'
                         returnKeyType='done'
+                        onSubmitEditing={loginUser}
                     />
                     <View />
-                    <TouchableOpacity style={styles.btn} onPress={async () => {
-                        try {
-                            const token = await Apis.login(email, password);
-                            setAccessToken(token);
-                        } catch (error) {
-                            console.log(error);
-                        }
-                    }}>
+                    <TouchableOpacity style={styles.btn} onPress={loginUser}>
                         <Text style={styles.btnText}>Login</Text>
                     </TouchableOpacity>
                     <Text style={styles.itemText} onPress={() => setScreenToShow(Screens.SIGN_UP)}>Don&apos;t have an account yet?</Text>
@@ -63,6 +70,19 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVerify, setPasswordVerify] = useState('');
+
+    const emailRef = useRef(null);
+    const passwordRef = useRef(null);
+    const verifyPasswordRef = useRef(null);
+
+    const signUpUser = async () => {
+        try {
+            const token = await Apis.sign_up(username, email, password);
+            setAccessToken(token);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <ScreenContainer>
@@ -82,8 +102,11 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                         autoComplete='off'
                         textContentType='username'
                         returnKeyType='next'
+                        onSubmitEditing={() => emailRef.current?.focus()}
+                        submitBehavior='submit'
                     />
                     <TextInput
+                        ref={emailRef}
                         value={email}
                         onChangeText={setEmail}
                         placeholder="Email"
@@ -92,8 +115,11 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                         keyboardType='email-address'
                         textContentType='emailAddress'
                         returnKeyType='next'
+                        onSubmitEditing={() => passwordRef.current?.focus()}
+                        submitBehavior='submit'
                     />
                     <TextInput
+                        ref={passwordRef}
                         value={password}
                         onChangeText={setPassword}
                         placeholder="Password"
@@ -103,9 +129,12 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                         textContentType="newPassword"
                         autoComplete="off"
                         returnKeyType='next'
+                        onSubmitEditing={() => verifyPasswordRef.current?.focus()}
+                        submitBehavior='submit'
                     />
 
                     <TextInput
+                        ref={verifyPasswordRef}
                         value={passwordVerify}
                         onChangeText={setPasswordVerify}
                         placeholder="Verify password"
@@ -115,17 +144,11 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
                         textContentType="newPassword"
                         autoComplete="off"
                         returnKeyType='done'
+                        onSubmitEditing={signUpUser}
                     />
                     <View />
                     <Text style={styles.itemText}>Passwords {password === passwordVerify ? "do" : "do not"} match</Text>
-                    <TouchableOpacity style={styles.btn} onPress={async () => {
-                        try {
-                            const token = await Apis.sign_up(username, email, password);
-                            setAccessToken(token);
-                        } catch (error) {
-                            console.log(error);
-                        }
-                    }}>
+                    <TouchableOpacity style={styles.btn} onPress={signUpUser}>
                         <Text style={styles.btnText}>Sign Up</Text>
                     </TouchableOpacity>
                     <Text style={styles.itemText} onPress={() => { setScreenToShow(Screens.LOG_IN) }}>Have an account?</Text>
