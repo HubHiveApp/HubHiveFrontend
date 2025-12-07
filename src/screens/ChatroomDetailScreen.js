@@ -10,9 +10,9 @@ const seed = [
   { id: 'm2', author: 'Andy', text: 'Hello' }
 ];
 
-export default function ChatroomDetailScreen({ route }) {
+export default function ChatroomDetailScreen({ navigation, route }) {
   const { accessToken, setAccessToken } = useAccessToken();
-  const { id } = route.params;
+  const { id, name } = route.params;
 
   const [messages, setMessages] = React.useState([]);
   const [text, setText] = React.useState('');
@@ -42,6 +42,10 @@ export default function ChatroomDetailScreen({ route }) {
 
   useFocusEffect(
     useCallback(() => {
+      navigation.setOptions({
+        title: name
+      });
+      
       // Set socket token
       ApiInteraction.socket.setToken(accessToken);
 

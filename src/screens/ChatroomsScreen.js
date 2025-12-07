@@ -52,7 +52,7 @@ export default function ChatroomsScreen({ navigation }) {
                 onPress={async () => {
                   const canJoin = await ApiInteraction.join_chatroom(accessToken, item.id);  
                   if (canJoin) {  
-                    navigation.navigate('ChatroomDetail', { id: item.id });
+                    navigation.navigate('ChatroomDetail', { id: item.id, name: item.name });
                   }
                 }}
               />
