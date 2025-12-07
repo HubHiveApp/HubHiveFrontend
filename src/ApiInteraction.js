@@ -188,6 +188,32 @@ class Apis {
         return result.chatrooms;
     }
 
+    async create_chatroom(token, { name, description, business_id, location, is_private, max_participants }) {
+        const response = await fetch(`${this.apiBaseUrl}/chat/rooms`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                business_id,
+                location,
+                is_private,
+                max_participants
+            }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to create chatroom');
+        }
+        return result;
+    }
+
     async join_chatroom(token, room_id) {
         const response = await fetch(`${this.apiBaseUrl}/chat/rooms/${room_id}/join`, {
             method: 'POST',
@@ -283,6 +309,24 @@ class Apis {
             throw new Error(result.error || 'Failed to get image hash');
         }
         return result.hash;
+    }
+
+    // Business-owned chatrooms for the authenticated user
+    async get_my_business_chatrooms(token) {
+        const response = await fetch(`${this.apiBaseUrl}/businesses/my-chatrooms`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to load owned chatrooms');
+        }
+        // Expecting backend to return { chatrooms: [...] }
+        return result.chatrooms || [];
     }
 }
 

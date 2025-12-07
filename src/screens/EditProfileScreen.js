@@ -8,28 +8,35 @@ import { Alert, Button, Image, Pressable, StyleSheet, Text, TextInput } from "re
 
 export default function EditProfileScreen({ route, navigation }) {
     const { accessToken } = useAccessToken();
+    const [displayName, setDisplayName] = useState('');
     const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
     const [editedProfilePic, setEditedProfilePic] = useState(null);
 
     const { profile } = route.params; // profile = { user: {...} }
 
-    const updateProfile = async () => {
-        try {
-            let to_update = { username };
-            if (bio !== profile.user.bio) {
-                to_update = { ...to_update, bio };
+    const updateProfile = useCallback(
+        async () => {
+            try {
+                let to_update = { username };
+                if (bio !== profile.user.bio) {
+                    to_update = { ...to_update, bio };
+                }
+                if (displayName !== profile.user.display_name) {
+                    to_update = { ...to_update, 'display_name': displayName };
+                }
+                await ApiInteraction.update_profile(accessToken, to_update);
+                if (editedProfilePic) {
+                    await ApiInteraction.upload_profile_picture(accessToken, editedProfilePic.uri);
+                }
+                Alert.alert("Success", "Profile updated.", [{ onPress: () => navigation.goBack() }]);
+            } catch (err) {
+                console.log(err);
+                Alert.alert("Error", err.message || "Failed to update profile.");
             }
-            await ApiInteraction.update_profile(accessToken, to_update);
-            if (editedProfilePic) {
-                await ApiInteraction.upload_profile_picture(accessToken, editedProfilePic.uri);
-            }
-            Alert.alert("Success", "Profile updated.", [{ onPress: () => navigation.goBack() }]);
-        } catch (err) {
-            console.log(err);
-            Alert.alert("Error", err.message || "Failed to update profile.");
-        }
-    };
+        }, [accessToken, bio, editedProfilePic, navigation, username, profile, displayName]
+    );
+        
 
     // populate username/bio when screen gains focus
     useFocusEffect(
@@ -37,6 +44,7 @@ export default function EditProfileScreen({ route, navigation }) {
             if (!profile || !profile.user) return;
             setUsername(profile.user.username || "");
             setBio(profile.user.bio || "");
+            setDisplayName(profile.user.display_name || "");
         }, [profile])
     );
 
@@ -87,6 +95,16 @@ export default function EditProfileScreen({ route, navigation }) {
                 <Image source={{ uri: editedProfilePic?.uri ?? profile?.user?.profile_picture ? `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` : 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
                 <Button title="Change Profile Photo" onPress={handleChangeProfilePicture} />
             </Pressable>
+
+            <Text style={styles.itemText}>Display Name</Text>
+            <TextInput
+                value={displayName}
+                onChangeText={setDisplayName}
+                placeholder="Display Name"
+                style={styles.input}
+                placeholderTextColor="#6b7280"
+            />
+
             <Text style={styles.itemText}>Username</Text>
             <TextInput
                 value={username}
