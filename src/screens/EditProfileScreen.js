@@ -84,7 +84,7 @@ export default function EditProfileScreen({ route, navigation }) {
     return (
         <ScreenContainer>
             <Pressable onPress={handleChangeProfilePicture} style={{ marginHorizontal: 'auto' }} >
-                <Image source={{ uri: editedProfilePic?.uri ?? `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` }} style={styles.avatar} />
+                <Image source={{ uri: editedProfilePic?.uri ?? profile?.user?.profile_picture ? `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` : 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
                 <Button title="Change Profile Photo" onPress={handleChangeProfilePicture} />
             </Pressable>
             <Text style={styles.itemText}>Username</Text>

@@ -1,8 +1,9 @@
+import Constants from "expo-constants";
 import { io } from "socket.io-client";
 
 class Apis {
     constructor() {
-        this.baseUrl = 'http://localhost:8000';
+        this.baseUrl = Constants.expoConfig.extra.baseUrl;
         this.apiBaseUrl = `${this.baseUrl}/api`
         this._token = null;
         this._initSocket();

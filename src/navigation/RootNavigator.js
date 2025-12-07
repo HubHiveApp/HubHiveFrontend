@@ -88,9 +88,9 @@ export default function RootNavigator() {
         <Stack.Screen name="Tabs" options={{ headerShown: false }}>
           {() => <Tabs accessToken={accessToken} />}
         </Stack.Screen>
-        <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom' }} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile' }} />
-        <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen}/>
+        <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerBackButtonDisplayMode: 'minimal' }} />
+        <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen} options={{ title: 'Create Chatroom', headerBackButtonDisplayMode: 'minimal' }}/>
       </Stack.Navigator>
     </TokenContext.Provider>
   );
