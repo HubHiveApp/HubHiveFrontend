@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.hubhive-expo",
+      "bundleIdentifier": "com.anonymous.hubhive-expo"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,6 +31,9 @@
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "baseUrl": "http://localhost:8000"
     },
     "plugins": [
       "expo-router",
@@ -58,7 +61,8 @@
         {
           "photosPermission": "$(PRODUCT_NAME) accesses your photos to let you pick a profile picture."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
