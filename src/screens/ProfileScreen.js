@@ -42,8 +42,13 @@ export default function ProfileScreen({ navigation }) {
   style={styles.avatar}
 />
         <View style={{ flex: 1 }}>
-          <Text style={styles.name}>{username}</Text>
-          <Text style={styles.meta}>@{username} • {email}</Text>
+          // old lines
+          //<Text style={styles.name}>{username}</Text>
+          //<Text style={styles.meta}>@{username} • {email}</Text>
+
+          //new lines
+          <Text style={styles.name}>{profile?.user?.display_name ?? username}</Text>
+          <Text style={styles.meta}>{email}</Text>
         </View>
       </View>
 
