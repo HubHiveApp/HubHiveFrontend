@@ -2,7 +2,7 @@ import Apis from '@/ApiInteraction';
 import ScreenContainer from "@/components/ScreenContainer";
 import { useAccessToken } from "@/context/AuthContext";
 import { useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 function LoginScreen({ setAccessToken, setScreenToShow }) {
     const [email, setEmail] = useState('');
@@ -15,6 +15,7 @@ function LoginScreen({ setAccessToken, setScreenToShow }) {
             setAccessToken(token);
         } catch (error) {
             console.log(error);
+            Alert.alert("Error", error.message);
         }
     };
 
@@ -81,6 +82,7 @@ function SignUpScreen({ setAccessToken, setScreenToShow }) {
             setAccessToken(token);
         } catch (error) {
             console.log(error);
+            Alert.alert("Error", error.message);
         }
     };
 
