@@ -81,7 +81,7 @@ export default function HomeScreen({ navigation }) {
             let can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
 
             if (can_join) {
-              navigation.navigate('ChatroomDetail', { id: item.id })
+              navigation.navigate('ChatroomDetail', { id: item.id, name: item.name })
             }
           }} />
         ))}

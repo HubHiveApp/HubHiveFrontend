@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "hubhive-expo",
-    "slug": "hubhive-expo",
-    "version": "1.0.0",
+    "name": "HubHive",
+    "slug": "hubhive",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "hubhiveexpo",
+    "scheme": "hubhive",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.hubhive-expo"
+      "bundleIdentifier": "com.hubhive.hubhive-frontend"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,14 +26,14 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.hubhiveexpo"
+      "package": "com.hubhive.hubhive_frontend"
     },
     "web": {
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "extra": {
-      "baseUrl": "http://localhost:8000"
+      "baseUrl": "https://hubhive.andylin.dev"
     },
     "plugins": [
       "expo-router",

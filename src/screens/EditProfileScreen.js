@@ -22,7 +22,7 @@ export default function EditProfileScreen({ route, navigation }) {
                 if (bio !== profile.user.bio) {
                     to_update = { ...to_update, bio };
                 }
-                if (displayName !== profile.user.display_name) {
+                if (displayName != profile.user.display_name) {
                     to_update = { ...to_update, 'display_name': displayName };
                 }
                 await ApiInteraction.update_profile(accessToken, to_update);
@@ -36,7 +36,6 @@ export default function EditProfileScreen({ route, navigation }) {
             }
         }, [accessToken, bio, editedProfilePic, navigation, username, profile, displayName]
     );
-        
 
     // populate username/bio when screen gains focus
     useFocusEffect(
@@ -92,7 +91,7 @@ export default function EditProfileScreen({ route, navigation }) {
     return (
         <ScreenContainer>
             <Pressable onPress={handleChangeProfilePicture} style={{ marginHorizontal: 'auto' }} >
-                <Image source={{ uri: editedProfilePic?.uri ?? profile?.user?.profile_picture ? `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` : 'https://randomuser.me/api/portraits/men/1.jpg' }} style={styles.avatar} />
+                <Image source={{ uri: editedProfilePic?.uri ?? (profile?.user?.profile_picture ? `${ApiInteraction.baseUrl}/${profile.user.profile_picture}` : 'https://randomuser.me/api/portraits/men/1.jpg') }} style={styles.avatar} />
                 <Button title="Change Profile Photo" onPress={handleChangeProfilePicture} />
             </Pressable>
 
