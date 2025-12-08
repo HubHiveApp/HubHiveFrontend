@@ -22,7 +22,7 @@ export default function EditProfileScreen({ route, navigation }) {
                 if (bio !== profile.user.bio) {
                     to_update = { ...to_update, bio };
                 }
-                if (displayName !== profile.user.display_name) {
+                if (displayName != profile.user.display_name) {
                     to_update = { ...to_update, 'display_name': displayName };
                 }
                 await ApiInteraction.update_profile(accessToken, to_update);
