@@ -314,9 +314,9 @@ class Apis {
     // Fetch public events from /api/events 
     async get_events(
         token,
-        { lat, lng, max_distance, category } = {} // NEW
-    )   {
-        const url = new URL(`${this.apiBaseUrl}/events`); // NEW
+        { lat, lng, max_distance, category } = {}
+    ) {
+        const url = new URL(`${this.apiBaseUrl}/events`);
     
         // only send filters if provided
         if (lat != null) url.searchParams.append("lat", String(lat));
@@ -329,7 +329,7 @@ class Apis {
           Accept: "application/json",
         };
         if (token) {
-          headers.Authorization = `Bearer ${token}`; // ok even though endpoint is public
+          headers.Authorization = `Bearer ${token}`;
         }
     
         const response = await fetch(url.toString(), {

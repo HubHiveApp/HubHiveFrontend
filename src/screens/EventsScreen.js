@@ -1,27 +1,9 @@
-import React from 'react';
-import ScreenContainer from '@/components/ScreenContainer';
-import Header from '@/components/Header';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
-
-/* export default function EventsScreen() {
-  return (
-    <ScreenContainer>
-      <Header title="Events" subtitle="Local happenings" />
-      <View style={styles.empty}>
-        <Text style={styles.emptyText}>No events yet.</Text>
-      </View>
-    </ScreenContainer>
-  );
-}
-
-const styles = StyleSheet.create({
-  empty: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  emptyText: { color: '#9ca3af' }
-}); */
-
-// hook + API helper
-import { useAccessToken } from '@/context/AuthContext';
 import ApiInteraction from '@/ApiInteraction';
+import Header from '@/components/Header';
+import ScreenContainer from '@/components/ScreenContainer';
+import { useAccessToken } from '@/context/AuthContext';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function EventsScreen() {
   //state for events, loading, error
@@ -38,7 +20,6 @@ export default function EventsScreen() {
       setLoading(true);
       setError(null);
 
-      //Requires a get_events(token) helper in ApiInteraction 
       const result = await ApiInteraction.get_events(accessToken);
       setEvents(result || []);
     } catch (err) {
@@ -110,7 +91,6 @@ export default function EventsScreen() {
           data={events}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderEvent}
-          contentContainerStyle={styles.listContent}
         />
       )}
     </ScreenContainer>
@@ -146,9 +126,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: '#9ca3af',
-  },
-  listContent: {
-    padding: 16,
   },
   eventCard: {
     backgroundColor: '#111827',
