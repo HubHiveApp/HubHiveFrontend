@@ -311,6 +311,59 @@ class Apis {
         return result.hash;
     }
 
+    // Fetch public events from /api/events 
+    async get_events(
+        token,
+        { lat, lng, max_distance, category } = {} // NEW
+    )   {
+        const url = new URL(`${this.apiBaseUrl}/events`); // NEW
+    
+        // only send filters if provided
+        if (lat != null) url.searchParams.append("lat", String(lat));
+        if (lng != null) url.searchParams.append("lng", String(lng));
+        if (max_distance != null)
+          url.searchParams.append("max_distance", String(max_distance));
+        if (category) url.searchParams.append("category", category);
+    
+        const headers = {
+          Accept: "application/json",
+        };
+        if (token) {
+          headers.Authorization = `Bearer ${token}`; // ok even though endpoint is public
+        }
+    
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers,
+        });
+    
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to load events");
+        }
+        return result.events || []; // NEW
+      }
+
+    // Allow business users to create a new event
+      async create_event(token, eventData) {
+        const response = await fetch(`${this.apiBaseUrl}/events`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        });
+    
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to create event");
+        }
+        return result.event; // NEW
+      }
+
+
     // Business-owned chatrooms for the authenticated user
     async get_my_business_chatrooms(token) {
         const response = await fetch(`${this.apiBaseUrl}/businesses/my-chatrooms`, {
