@@ -20,18 +20,22 @@ export default function EventsScreen() {
     if (!accessToken) return;
 
     try {
-      setLoading(true);
+      if (events.length === 0) {
+        setLoading(true);
+      }
       setError(null);
 
       const result = await ApiInteraction.get_events(accessToken, {lat: coordinates[1], lng: coordinates[2]});
-      setEvents(result || []);
+      setEvents(prev => result || prev);
     } catch (err) {
       console.error('Failed to load events', err);
-      setError(err.message || 'Failed to load events');
+      if (events.length === 0) {
+        setError(err.message || 'Failed to load events');
+      }
     } finally {
       setLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, coordinates]);
 
   //load events when screen mounts / token changes
   useEffect(() => {
