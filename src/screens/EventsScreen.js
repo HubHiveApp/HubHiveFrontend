@@ -2,6 +2,7 @@ import ApiInteraction from '@/ApiInteraction';
 import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
+import { useLocationContext } from '@/context/LocationContext';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -12,6 +13,8 @@ export default function EventsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { coordinates } = useLocationContext();
+
   // function that calls the backend
   const loadEvents = useCallback(async () => {
     if (!accessToken) return;
@@ -20,7 +23,7 @@ export default function EventsScreen() {
       setLoading(true);
       setError(null);
 
-      const result = await ApiInteraction.get_events(accessToken);
+      const result = await ApiInteraction.get_events(accessToken, {lat: coordinates[1], lng: coordinates[2]});
       setEvents(result || []);
     } catch (err) {
       console.error('Failed to load events', err);
@@ -58,7 +61,7 @@ export default function EventsScreen() {
 
   return (
     <ScreenContainer>
-      <Header title="Events" subtitle="Local happenings" />
+      <Header title="Events" subtitle="Local happenings" secondSubtitle={"Your current location: " + coordinates[0]}/>
 
       {/*loading state */}
       {loading && (

@@ -1,5 +1,6 @@
 import ApiInteraction from '@/ApiInteraction';
 import { TokenContext } from '@/context/AuthContext';
+import { LocationContext } from '@/context/LocationContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
 import CreateChatroomScreen from '@/screens/CreateChatroomScreen';
@@ -12,6 +13,7 @@ import ProfileScreen from '@/screens/ProfileScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useReducer, useState } from 'react';
 
@@ -72,6 +74,7 @@ function Tabs({ accessToken }) {
 }
 
 export default function RootNavigator() {
+  // auth token sync
   const jwtKey = 'jwt';
   const reducer = (_, newState) => {
     SecureStore.setItem(jwtKey, newState);
@@ -82,16 +85,59 @@ export default function RootNavigator() {
 
   const [accessToken, setAccessToken] = useReducer(reducer, '', initialState);
 
+  // location
+  useEffect(() => {
+      let locationSubscription;
+
+      async function setNewLocation(locationObj) {
+        const { latitude, longitude } = locationObj.coords;
+
+        const reverseGeocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const name = reverseGeocode[0]?.name || reverseGeocode[0]?.formattedAddress || reverseGeocode[0]?.city || "Current Location";
+
+        setCoordinates([name, latitude, longitude]);
+      }
+
+      (async () => {
+        let permissionResult = await Location.requestForegroundPermissionsAsync();
+
+        if (!permissionResult.granted) {
+          console.log(`Status: ${permissionResult.status}`)
+          return;
+        }
+
+        const currentLocation = await Location.getCurrentPositionAsync();
+
+        setNewLocation(currentLocation);
+
+        locationSubscription = await Location.watchPositionAsync({
+          accuracy: Location.LocationAccuracy.Balanced,
+          distanceInterval: 100,
+        },
+          (location) => {
+            setNewLocation(location)
+          })
+      })();
+
+      return () => {
+        locationSubscription?.remove();
+      };
+  }, []);
+
+  const [coordinates, setCoordinates] = useState(["NYU Tandon Campus", 40.7291, -73.9965]);
+
   return (
     <TokenContext.Provider value={{ accessToken, setAccessToken }}>
-      <Stack.Navigator>
-        <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-          {() => <Tabs accessToken={accessToken} />}
-        </Stack.Screen>
-        <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerBackButtonDisplayMode: 'minimal' }} />
-        <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen} options={{ title: 'Create Chatroom', headerBackButtonDisplayMode: 'minimal' }}/>
-      </Stack.Navigator>
+      <LocationContext.Provider value={{ coordinates, setCoordinates }}>
+        <Stack.Navigator>
+          <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+            {() => <Tabs accessToken={accessToken} />}
+          </Stack.Screen>
+          <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen} options={{ title: 'Create Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
+        </Stack.Navigator>
+      </LocationContext.Provider>
     </TokenContext.Provider>
   );
 }
