@@ -2,7 +2,7 @@
   "expo": {
     "name": "HubHive",
     "slug": "hubhive",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "hubhive",
@@ -33,7 +33,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "extra": {
-      "baseUrl": "http://34.59.79.101:8000"
+      "baseUrl": "https://hubhive.andylin.dev"
     },
     "plugins": [
       "expo-router",
