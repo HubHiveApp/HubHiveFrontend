@@ -50,24 +50,6 @@ export default function EventsScreen() {
       dateLabel = dt.toLocaleString();
     }
 
-    const handleCreate = async () => {
-      try {
-        const event = await ApiInteraction.create_event(accessToken, {
-          title,
-          description,
-          event_date,
-          location,
-          max_attendees,
-          category,
-          is_public: true,
-        });
-        //navigate back or refresh list
-      } catch (err) {
-        console.error(err);
-        Alert.alert('Error', err.message);
-      }
-    };
-
     return (
       <View style={styles.eventCard}>
         <Text style={styles.eventTitle}>{item.title}</Text>
