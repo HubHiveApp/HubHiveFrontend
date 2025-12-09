@@ -1,6 +1,7 @@
 import ApiInteraction from '@/ApiInteraction';
-import { TokenContext } from '@/context/AuthContext';
+import { TokenContext, useAccessToken } from '@/context/AuthContext';
 import { LocationContext } from '@/context/LocationContext';
+import { UserLevelContext, useUserLevelContext } from '@/context/UserLevelContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
 import CreateChatroomScreen from '@/screens/CreateChatroomScreen';
@@ -21,26 +22,13 @@ import { useEffect, useReducer, useState } from 'react';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function Tabs({ accessToken }) {
-  const [userType, setUserType] = useState('');
+function Tabs() {
   const [loading, setLoading] = useState(true);
+  const { accessToken } = useAccessToken();
+  const { userType } = useUserLevelContext();
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      if (!accessToken) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const result = await ApiInteraction.get_profile(accessToken);
-        if (!cancelled) setUserType(result.user.user_type);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => { cancelled = true; };
+    setLoading(!accessToken);
   }, [accessToken]);
 
   if (!accessToken) return <LoginOrSignUpScreen />;
@@ -64,7 +52,7 @@ function Tabs({ accessToken }) {
           return <Ionicons name={map[route.name]} size={size} color={color} />;
         }
       })}>
-      {userType === 'business'
+      {userType !== 'regular'
         ? <Tab.Screen name="Home" component={ChatroomsScreen} />
         : <Tab.Screen name="Home" component={HomeScreen} />}
       <Tab.Screen name="Messages" component={MessagesScreen} />
@@ -127,18 +115,30 @@ export default function RootNavigator() {
 
   const [coordinates, setCoordinates] = useState(["NYU Tandon Campus", 40.7291, -73.9965]);
 
+  useEffect(() => {
+    async function load() {
+      const result = await ApiInteraction.get_profile(accessToken);
+      setUserType(result.user.user_type);
+    }
+    load();
+  }, [accessToken]);
+
+  const [userType, setUserType] = useState('');
+
   return (
     <TokenContext.Provider value={{ accessToken, setAccessToken }}>
       <LocationContext.Provider value={{ coordinates, setCoordinates }}>
-        <Stack.Navigator>
-          <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-            {() => <Tabs accessToken={accessToken} />}
-          </Stack.Screen>
-          <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerBackButtonDisplayMode: 'minimal' }} />
-          <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen} options={{ title: 'Create Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
-          <Stack.Screen name="CreateEvent" component={CreateEventScreen} options={{ title: 'Create Event', headerBackButtonDisplayMode: 'minimal' }} />
-        </Stack.Navigator>
+        <UserLevelContext.Provider value={{ userType, setUserType }}>
+          <Stack.Navigator>
+            <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+              {() => <Tabs/>}
+            </Stack.Screen>
+            <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerBackButtonDisplayMode: 'minimal' }} />
+            <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen} options={{ title: 'Create Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
+            <Stack.Screen name="CreateEvent" component={CreateEventScreen} options={{ title: 'Create Event', headerBackButtonDisplayMode: 'minimal' }} />
+          </Stack.Navigator>
+        </UserLevelContext.Provider>
       </LocationContext.Provider>
     </TokenContext.Provider>
   );
