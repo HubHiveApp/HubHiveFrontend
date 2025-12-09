@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useLocationContext } from '@/context/LocationContext';
+import { useUserLevelContext } from '@/context/UserLevelContext';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -12,6 +13,7 @@ export default function EventsScreen({ navigation }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { userType } = useUserLevelContext();
 
   const { coordinates } = useLocationContext();
 
@@ -25,7 +27,7 @@ export default function EventsScreen({ navigation }) {
       }
       setError(null);
 
-      const result = await ApiInteraction.get_events(accessToken, {lat: coordinates[1], lng: coordinates[2]});
+      const result = await ApiInteraction.get_events(accessToken, { lat: coordinates[1], lng: coordinates[2] });
       setEvents(prev => result || prev);
     } catch (err) {
       console.error('Failed to load events', err);
@@ -95,11 +97,13 @@ export default function EventsScreen({ navigation }) {
       {/* events list */}
       {!loading && !error && events.length > 0 && (
         <View>
-          <TouchableOpacity style={styles.btn} onPress={() => {
-            navigation.navigate('CreateEvent');
-          }}>
-            <Text style={styles.btnText}>+ New Event</Text>
-          </TouchableOpacity>
+          {userType !== 'regular' &&
+            <TouchableOpacity style={styles.btn} onPress={() => {
+              navigation.navigate('CreateEvent');
+            }}>
+              <Text style={styles.btnText}>+ New Event</Text>
+            </TouchableOpacity>
+          }
           <FlatList
             data={events}
             keyExtractor={(item) => String(item.id)}
