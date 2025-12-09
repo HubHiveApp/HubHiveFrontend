@@ -17,6 +17,9 @@ import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useReducer, useState } from 'react';
 
+//ADDED: import CreateEventScreen
+import CreateEventScreen from '@/screens/CreateEventScreen'; 
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
