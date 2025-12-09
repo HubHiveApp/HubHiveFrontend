@@ -1,47 +1,46 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import ApiInteraction from '@/ApiInteraction';
-import { useAccessToken, useUserContext } from '@/context/AuthContext';
 import ScreenContainer from '@/components/ScreenContainer';
-import Header from '@/components/Header';
-import { useLocationContext } from '@/context/LocationContext'; 
+import { useAccessToken } from '@/context/AuthContext';
+import { useLocationContext } from '@/context/LocationContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 
 export default function CreateEventScreen({ navigation }) {
   const { accessToken } = useAccessToken();
-  const { user } = useUserContext();
   const { coordinates } = useLocationContext(); // (["name", lat, lng])
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [eventDate, setEventDate] = useState('');
+  const [eventDate, setEventDate] = useState(new Date());
 
   const handleCreate = async () => {
     // --- basic safety checks --- // 
-    if (!accessToken) { 
-      Alert.alert('Error', 'You must be logged in to create an event.'); 
-      return; 
-    } 
+    if (!accessToken) {
+      Alert.alert('Error', 'You must be logged in to create an event.');
+      return;
+    }
 
-    if (!title || !eventDate) { 
+    if (!title || !eventDate) {
       Alert.alert('Missing fields', 'Title and date are required.');
-      return; 
-    } 
+      return;
+    }
 
     try {
       // Build location object from LocationContext (if available)
       const location =
-        coordinates && coordinates.length === 3 
-          ? {                                   
-              name: coordinates[0],             
-              latitude: coordinates[1],         
-              longitude: coordinates[2],        
-            }                                   
-          : undefined;                          
+        coordinates && coordinates.length === 3
+          ? {
+            name: coordinates[0],
+            latitude: coordinates[1],
+            longitude: coordinates[2],
+          }
+          : undefined;
 
       const newEvent = await ApiInteraction.create_event(accessToken, {
         title,
         description,
-        event_date: eventDate,   // must be ISO format
+        event_date: eventDate.toISOString(),   // must be ISO format
         location,                // (JSON field used by backend)
         is_public: true,         // (so it shows up in /api/events)
       });
@@ -54,57 +53,69 @@ export default function CreateEventScreen({ navigation }) {
     }
   };
 
-  if (user?.user_type !== 'business') {
-    return (
-      <ScreenContainer>
-        <Header title="Create Event" />
-        <Text style={{ color: '#ef4444' }}>Only business accounts can create events.</Text>
-      </ScreenContainer>
-    );
-  }
-
   return (
     <ScreenContainer>
-      <Header
-        title="Create Event"
-        subtitle="Add details to publish your event"
-      />
+      <ScrollView style={styles.form}>
+        <Text style={styles.label}>Title *</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Title"
-        placeholderTextColor="#6b7280"
-        onChangeText={setTitle}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Title"
+          placeholderTextColor="#6b7280"
+          onChangeText={setTitle}
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Description"
-        placeholderTextColor="#6b7280"
-        onChangeText={setDescription}
-      />
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Description"
+          placeholderTextColor="#6b7280"
+          onChangeText={setDescription}
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Event Date (YYYY-MM-DDTHH:MM:SSZ)"
-        placeholderTextColor="#6b7280"
-        onChangeText={setEventDate}
-      />
+        <Text style={styles.label}>Event Date *</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleCreate}>
-        <Text style={styles.buttonText}>Publish Event</Text>
-      </TouchableOpacity>
+        <DateTimePicker
+          value={eventDate}
+          mode='datetime'
+          onChange={(event, selectedDate) => {
+            if (selectedDate) {
+              setEventDate(selectedDate);
+            }
+          }}
+          minimumDate={new Date()}
+          themeVariant='dark'
+          style={{marginHorizontal: -8}}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleCreate}>
+          <Text style={styles.buttonText}>Publish Event</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: '#1f2937',
-    color: 'white',
-    padding: 12,
+    backgroundColor: '#111827',
     borderRadius: 8,
-    marginBottom: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: '#e5e7eb',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    fontSize: 16
+  },
+  form: {
+    flex: 1,
+  },
+  label: {
+    color: '#e5e7eb',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    marginTop: 16
   },
   button: {
     backgroundColor: '#2563eb',
