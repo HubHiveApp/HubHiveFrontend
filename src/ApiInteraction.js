@@ -316,7 +316,7 @@ class Apis {
         token,
         { lat, lng, max_distance, category } = {}
     ) {
-        const url = new URL(`${this.apiBaseUrl}/events`);
+        const url = new URL(`${this.apiBaseUrl}/events/`);
     
         // only send filters if provided
         if (lat != null) url.searchParams.append("lat", String(lat));
@@ -341,17 +341,17 @@ class Apis {
         if (!response.ok) {
           throw new Error(result.error || "Failed to load events");
         }
-        return result.events || []; // NEW
+        return result.events || [];
       }
 
     // Allow business users to create a new event
       async create_event(token, eventData) {
-        const response = await fetch(`${this.apiBaseUrl}/events`, {
+        const response = await fetch(`${this.apiBaseUrl}/events/`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`,
+            'Accept': "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(eventData),
         });
@@ -360,7 +360,7 @@ class Apis {
         if (!response.ok) {
           throw new Error(result.error || "Failed to create event");
         }
-        return result.event; // NEW
+        return result.event;
       }
 
 
