@@ -1,5 +1,4 @@
 import ApiInteraction from '@/ApiInteraction';
-import Header from '@/components/Header';
 import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useState } from 'react';
@@ -49,8 +48,6 @@ export default function CreateChatroomScreen({ navigation }) {
 
   return (
     <ScreenContainer>
-      <Header title="Create Chatroom"/>
-      
       <ScrollView style={styles.form}>
         <Text style={styles.label}>Name *</Text>
         <TextInput
