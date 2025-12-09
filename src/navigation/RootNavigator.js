@@ -4,6 +4,7 @@ import { LocationContext } from '@/context/LocationContext';
 import ChatroomDetailScreen from '@/screens/ChatroomDetailScreen';
 import ChatroomsScreen from '@/screens/ChatroomsScreen';
 import CreateChatroomScreen from '@/screens/CreateChatroomScreen';
+import CreateEventScreen from '@/screens/CreateEventScreen';
 import EditProfileScreen from '@/screens/EditProfileScreen';
 import EventsScreen from '@/screens/EventsScreen';
 import HomeScreen from '@/screens/HomeScreen';
@@ -16,9 +17,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useReducer, useState } from 'react';
-
-//ADDED: import CreateEventScreen
-import CreateEventScreen from '@/screens/CreateEventScreen'; 
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -139,6 +137,7 @@ export default function RootNavigator() {
           <Stack.Screen name="ChatroomDetail" component={ChatroomDetailScreen} options={{ title: 'Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerBackButtonDisplayMode: 'minimal' }} />
           <Stack.Screen name="CreateChatroom" component={CreateChatroomScreen} options={{ title: 'Create Chatroom', headerBackButtonDisplayMode: 'minimal' }} />
+          <Stack.Screen name="CreateEvent" component={CreateEventScreen} options={{ title: 'Create Event', headerBackButtonDisplayMode: 'minimal' }} />
         </Stack.Navigator>
       </LocationContext.Provider>
     </TokenContext.Provider>
