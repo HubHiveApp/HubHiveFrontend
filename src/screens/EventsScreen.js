@@ -6,7 +6,7 @@ import { useLocationContext } from '@/context/LocationContext';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function EventsScreen() {
+export default function EventsScreen({ navigation }) {
   //state for events, loading, error
   const { accessToken } = useAccessToken();
   const [events, setEvents] = useState([]);
@@ -94,11 +94,18 @@ export default function EventsScreen() {
 
       {/* events list */}
       {!loading && !error && events.length > 0 && (
-        <FlatList
-          data={events}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderEvent}
-        />
+        <View>
+          <TouchableOpacity style={styles.btn} onPress={() => {
+            navigation.navigate('CreateEvent');
+          }}>
+            <Text style={styles.btnText}>+ New Event</Text>
+          </TouchableOpacity>
+          <FlatList
+            data={events}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={renderEvent}
+          />
+        </View>
       )}
     </ScreenContainer>
   );
@@ -157,6 +164,14 @@ const styles = StyleSheet.create({
     color: '#d1d5db',
     fontSize: 14,
   },
+  btn: {
+    backgroundColor: '#38bdf8',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  btnText: { color: '#0b1220', fontWeight: '700' },
 });
 
 
