@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView } from 'react-native';
 
 import ApiInteraction from '@/ApiInteraction';
@@ -10,7 +10,7 @@ import { useAccessToken } from '@/context/AuthContext';
 import { distanceKm } from '@/utils/distance';
 import { useFocusEffect } from '@react-navigation/native';
 
-import * as Location from 'expo-location';
+import { useLocationContext } from '@/context/LocationContext';
 
 const MOCK = [
   { id: '1', name: 'Library', venue: 'Dibner Library', distance: '100 ft', members: 24 },
@@ -19,11 +19,12 @@ const MOCK = [
 ];
 
 export default function HomeScreen({ navigation }) {
-  const { accessToken, setAccessToken } = useAccessToken();
+  const { accessToken } = useAccessToken();
+  const { coordinates } = useLocationContext();
 
   const [q, setQ] = React.useState('');
   const [list, setList] = useState([]);
-  const [coordinates, setCoordinates] = useState(["NYU Tandon Campus", 40.7291, -73.9965]);
+  
 
   useFocusEffect(
     useCallback(() => {
@@ -32,44 +33,6 @@ export default function HomeScreen({ navigation }) {
       })
     }, [coordinates])
   );
-
-  useEffect(() => {
-      let locationSubscription;
-
-      async function setNewLocation(locationObj) {
-        const { latitude, longitude } = locationObj.coords;
-
-        const reverseGeocode = await Location.reverseGeocodeAsync({ latitude, longitude });
-        const name = reverseGeocode[0]?.name || reverseGeocode[0]?.formattedAddress || reverseGeocode[0]?.city || "Current Location";
-
-        setCoordinates([name, latitude, longitude]);
-      }
-
-      (async () => {
-        let permissionResult = await Location.requestForegroundPermissionsAsync();
-
-        if (!permissionResult.granted) {
-          console.log(`Status: ${permissionResult.status}`)
-          return;
-        }
-
-        const currentLocation = await Location.getCurrentPositionAsync();
-
-        setNewLocation(currentLocation);
-
-        locationSubscription = await Location.watchPositionAsync({
-          accuracy: Location.LocationAccuracy.Balanced,
-          distanceInterval: 100,
-        },
-          (location) => {
-            setNewLocation(location)
-          })
-      })();
-
-      return () => {
-        locationSubscription?.remove();
-      };
-  }, []);
   
   return (
     <ScreenContainer>

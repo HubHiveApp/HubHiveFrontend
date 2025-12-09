@@ -36,7 +36,6 @@ export default function EditProfileScreen({ route, navigation }) {
             }
         }, [accessToken, bio, editedProfilePic, navigation, username, profile, displayName]
     );
-        
 
     // populate username/bio when screen gains focus
     useFocusEffect(
