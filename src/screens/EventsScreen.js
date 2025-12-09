@@ -6,7 +6,7 @@ import { useLocationContext } from '@/context/LocationContext';
 import { useUserLevelContext } from '@/context/UserLevelContext';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function EventsScreen({ navigation }) {
   //state for events, loading, error
@@ -14,6 +14,7 @@ export default function EventsScreen({ navigation }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
   const { userType } = useUserLevelContext();
 
   const { coordinates } = useLocationContext();
@@ -25,6 +26,8 @@ export default function EventsScreen({ navigation }) {
     try {
       if (events.length === 0) {
         setLoading(true);
+      } else {
+        setRefreshing(true)
       }
       setError(null);
 
@@ -37,6 +40,7 @@ export default function EventsScreen({ navigation }) {
       }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [accessToken, coordinates, events.length]);
 
@@ -113,6 +117,9 @@ export default function EventsScreen({ navigation }) {
             keyExtractor={(item) => String(item.id)}
             renderItem={renderEvent}
             contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={loadEvents}/>
+            }
           />
         )}
       </View>

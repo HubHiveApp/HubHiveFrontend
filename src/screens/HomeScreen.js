@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ScrollView } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 
 import ApiInteraction from '@/ApiInteraction';
 import ChatroomCard from '@/components/ChatroomCard';
@@ -22,23 +22,32 @@ export default function HomeScreen({ navigation }) {
   const { accessToken } = useAccessToken();
   const { coordinates } = useLocationContext();
 
+  const [refreshing, setRefreshing] = useState(false);
   const [q, setQ] = React.useState('');
   const [list, setList] = useState([]);
-  
+
+  const getChatrooms = useCallback(() => {
+    setRefreshing(true);
+    ApiInteraction.get_chatrooms(accessToken, coordinates[1], coordinates[2], 1).then((receivedChatrooms) => {
+      setList(receivedChatrooms);
+    })
+      .finally(() => setRefreshing(false));
+  }, [accessToken, coordinates]);
 
   useFocusEffect(
     useCallback(() => {
-      ApiInteraction.get_chatrooms(accessToken, coordinates[1], coordinates[2], 1).then((receivedChatrooms) => {
-        setList(receivedChatrooms);
-      })
-    }, [coordinates])
+      getChatrooms();
+    }, [getChatrooms])
   );
   
   return (
     <ScreenContainer>
       <Header title="Nearby chatrooms" subtitle="Discover chats around you" secondSubtitle={"Your current location: " + coordinates[0]} />
       <SearchBar value={q} onChangeText={setQ} placeholder="Search chatrooms or venues" />
-      <ScrollView style={{ marginTop: 12 }}>
+      <ScrollView style={{ marginTop: 12 }}
+        refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={getChatrooms}/>
+      }>
         {list.map(item => (
           <ChatroomCard key={item.id} {...item} distance={`${Math.round(distanceKm(coordinates[1], coordinates[2], item.location.latitude, item.location.longitude) * 100) / 100} km`} onPress={async () => {
             let can_join = await ApiInteraction.join_chatroom(accessToken, item.id);
@@ -51,6 +60,4 @@ export default function HomeScreen({ navigation }) {
       </ScrollView>
     </ScreenContainer>
   );
-  
-  
 }

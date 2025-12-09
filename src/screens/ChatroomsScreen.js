@@ -6,18 +6,26 @@ import { useAccessToken } from '@/context/AuthContext';
 import { distanceKm } from '@/utils/distance';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ChatroomsScreen({ navigation }) {
   const { accessToken, setAccessToken } = useAccessToken();
   const [list, setList] = useState([]);
   const [coordinates, setCoordinates] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refreshChatroomList = useCallback(() => {
+    setRefreshing(true);
+
+    ApiInteraction.get_my_business_chatrooms(accessToken).then((result) => {
+      setList(result);
+    })
+      .finally(() => setRefreshing(false));
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      ApiInteraction.get_my_business_chatrooms(accessToken).then((result) => {
-        setList(result);
-      })
+      refreshChatroomList();
       
       ApiInteraction.get_profile(accessToken).then((userInfo) => {
         setCoordinates([userInfo.user.location.address, userInfo.user.location.latitude, userInfo.user.location.longitude]);
@@ -39,7 +47,12 @@ export default function ChatroomsScreen({ navigation }) {
         </View>
       ) : (
         (coordinates[1] !== undefined && coordinates[2] !== undefined) ? (
-          <ScrollView style={{ marginTop: 12 }}>
+            <ScrollView
+              style={{ marginTop: 12 }}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={refreshChatroomList} />
+              }
+            >
             {list.map(item => (
               <ChatroomCard
                 key={item.id}
