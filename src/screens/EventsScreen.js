@@ -4,7 +4,8 @@ import ScreenContainer from '@/components/ScreenContainer';
 import { useAccessToken } from '@/context/AuthContext';
 import { useLocationContext } from '@/context/LocationContext';
 import { useUserLevelContext } from '@/context/UserLevelContext';
-import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function EventsScreen({ navigation }) {
@@ -37,12 +38,14 @@ export default function EventsScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, coordinates]);
+  }, [accessToken, coordinates, events.length]);
 
-  //load events when screen mounts / token changes
-  useEffect(() => {
-    loadEvents();
-  }, [loadEvents]);
+  // load events when screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      loadEvents();
+    }, [loadEvents])
+  );
 
   //render a single event row
   const renderEvent = ({ item }) => {
@@ -66,51 +69,53 @@ export default function EventsScreen({ navigation }) {
   };
 
   return (
-    <ScreenContainer>
-      <Header title="Events" subtitle="Local happenings" secondSubtitle={"Your current location: " + coordinates[0]}/>
+    <ScreenContainer padded={false}>
+      <View style={styles.body}>
+        <Header title="Events" subtitle="Local happenings" secondSubtitle={"Your current location: " + coordinates[0]} />
 
-      {/*loading state */}
-      {loading && (
-        <View style={styles.center}>
-          <ActivityIndicator />
-          <Text style={styles.loadingText}>Loading events…</Text>
-        </View>
-      )}
-
-      {/* error state with retry */}
-      {!loading && error && (
-        <View style={styles.center}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadEvents}>
-            <Text style={styles.retryText}>Tap to retry</Text>
+        {userType !== 'regular' &&
+          <TouchableOpacity style={styles.btn} onPress={() => {
+            navigation.navigate('CreateEvent');
+          }}>
+            <Text style={styles.btnText}>+ New Event</Text>
           </TouchableOpacity>
-        </View>
-      )}
+        }
 
-      {/* no-events state */}
-      {!loading && !error && events.length === 0 && (
-        <View style={styles.center}>
-          <Text style={styles.emptyText}>No events yet.</Text>
-        </View>
-      )}
+        {/*loading state */}
+        {loading && (
+          <View style={styles.center}>
+            <ActivityIndicator />
+            <Text style={styles.loadingText}>Loading events…</Text>
+          </View>
+        )}
 
-      {/* events list */}
-      {!loading && !error && events.length > 0 && (
-        <View>
-          {userType !== 'regular' &&
-            <TouchableOpacity style={styles.btn} onPress={() => {
-              navigation.navigate('CreateEvent');
-            }}>
-              <Text style={styles.btnText}>+ New Event</Text>
+        {/* error state with retry */}
+        {!loading && error && (
+          <View style={styles.center}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={loadEvents}>
+              <Text style={styles.retryText}>Tap to retry</Text>
             </TouchableOpacity>
-          }
+          </View>
+        )}
+
+        {/* no-events state */}
+        {!loading && !error && events.length === 0 && (
+          <View style={styles.center}>
+            <Text style={styles.emptyText}>No events yet.</Text>
+          </View>
+        )}
+
+        {/* events list */}
+        {!loading && !error && events.length > 0 && (
           <FlatList
             data={events}
             keyExtractor={(item) => String(item.id)}
             renderItem={renderEvent}
+            contentContainerStyle={styles.listContent}
           />
-        </View>
-      )}
+        )}
+      </View>
     </ScreenContainer>
   );
 }
@@ -168,6 +173,12 @@ const styles = StyleSheet.create({
     color: '#d1d5db',
     fontSize: 14,
   },
+  body: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 0,
+  },
   btn: {
     backgroundColor: '#38bdf8',
     borderRadius: 12,
@@ -176,6 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   btnText: { color: '#0b1220', fontWeight: '700' },
+  listContent: {
+    paddingBottom: 0,
+  },
 });
-
-
